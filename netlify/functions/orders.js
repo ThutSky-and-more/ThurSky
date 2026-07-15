@@ -1,271 +1,352 @@
-const { createClient } = require("@supabase/supabase-js");
-const crypto = require("node:crypto");
+from pathlib import Path
 
-const RESPONSE_HEADERS = {
-  "content-type": "application/json; charset=utf-8",
-  "cache-control": "no-store",
-  "access-control-allow-origin": "*",
-  "access-control-allow-headers": "authorization, content-type",
-  "access-control-allow-methods": "GET, POST, PATCH, OPTIONS"
+code = r'''const { createClient } = require("@supabase/supabase-js");
+
+const HEADERS = {
+  "Content-Type": "application/json; charset=utf-8",
+  "Cache-Control": "no-store",
 };
 
-const ALLOWED_STATUSES = [
-  "received",
-  "planning",
-  "confirmed",
-  "captured",
-  "editing",
-  "ready",
-  "completed",
-  "cancelled"
-];
-
-const STATUS_LABELS = {
-  received: "Anfrage eingegangen",
-  planning: "Termin wird geplant",
-  confirmed: "Termin bestätigt",
-  captured: "Aufnahmen erstellt",
-  editing: "In Bearbeitung",
-  ready: "Bereit zum Download",
-  completed: "Abgeschlossen",
-  cancelled: "Storniert"
-};
-
-function json(statusCode, payload) {
+function send(statusCode, payload) {
   return {
     statusCode,
-    headers: RESPONSE_HEADERS,
-    body: JSON.stringify(payload)
+    headers: HEADERS,
+    body: JSON.stringify(payload),
   };
 }
 
-function httpError(statusCode, message) {
+function makeError(statusCode, message) {
   const error = new Error(message);
   error.statusCode = statusCode;
   return error;
 }
 
-function parseBody(event) {
+function parseJson(event) {
   if (!event.body) return {};
 
   try {
     return JSON.parse(event.body);
   } catch {
-    throw httpError(400, "Ungültige JSON-Daten.");
+    throw makeError(400, "Ungültige JSON-Daten.");
   }
 }
 
-function getUser(context) {
-  const currentUser = context?.clientContext?.user;
+function getIdentityUser(event, context) {
+  /*
+   * Klassische Netlify Functions:
+   * context.clientContext.user
+   *
+   * Manche Laufzeiten stellen den Kontext zusätzlich unter event.context bereit.
+   */
+  const user =
+    context?.clientContext?.user ||
+    event?.context?.clientContext?.user ||
+    null;
 
-  if (!currentUser) {
-    throw httpError(401, "Bitte zuerst einloggen.");
+  if (!user) {
+    throw makeError(
+      401,
+      "Bitte zuerst anmelden. Das Identity-Token wurde von Netlify nicht erkannt."
+    );
   }
 
-  return currentUser;
-}
+  /*
+   * Netlify Identity liefert die UUID meistens als `sub`.
+   * In einigen Kontexten kann zusätzlich `id` vorhanden sein.
+   */
+  const customerId =
+    user.sub ||
+    user.id ||
+    user.user_metadata?.id ||
+    user.app_metadata?.id ||
+    null;
 
-function getRoles(currentUser) {
-  const roles = currentUser?.app_metadata?.roles;
-  return Array.isArray(roles) ? roles : [];
-}
-
-function requireAdmin(context) {
-  const currentUser = getUser(context);
-
-  if (!getRoles(currentUser).includes("admin")) {
-    throw httpError(403, "Nur Admins dürfen diese Aktion ausführen.");
+  if (!customerId) {
+    console.error("IDENTITY DEBUG – Benutzerobjekt:", JSON.stringify(user));
+    throw makeError(
+      401,
+      "Im Identity-Token wurde keine Benutzer-ID gefunden."
+    );
   }
 
-  return currentUser;
+  const email =
+    user.email ||
+    user.user_metadata?.email ||
+    null;
+
+  if (!email) {
+    throw makeError(
+      400,
+      "Im Identity-Token wurde keine E-Mail-Adresse gefunden."
+    );
+  }
+
+  const roles = Array.isArray(user.roles)
+    ? user.roles
+    : Array.isArray(user.app_metadata?.roles)
+      ? user.app_metadata.roles
+      : [];
+
+  return {
+    customerId: String(customerId),
+    email: String(email),
+    roles,
+    isAdmin: roles.includes("admin"),
+    raw: user,
+  };
 }
 
 function getSupabase() {
   const url = process.env.SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url) {
-    throw new Error("Die Netlify-Variable SUPABASE_URL fehlt.");
+    throw makeError(500, "SUPABASE_URL fehlt in Netlify.");
   }
 
-  if (!serviceKey) {
-    throw new Error("Die Netlify-Variable SUPABASE_SERVICE_ROLE_KEY fehlt.");
+  if (!key) {
+    throw makeError(
+      500,
+      "SUPABASE_SERVICE_ROLE_KEY fehlt in Netlify."
+    );
   }
 
-  return createClient(url, serviceKey, {
+  return createClient(url, key, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
-      detectSessionInUrl: false
-    }
+    },
   });
 }
 
-function createOrderNumber() {
-  const year = new Date().getFullYear();
-  const datePart = Date.now().toString().slice(-8);
-  const randomPart = crypto.randomBytes(2).toString("hex").toUpperCase();
-  return `TS-${year}-${datePart}-${randomPart}`;
+function required(value, label) {
+  const text = String(value ?? "").trim();
+
+  if (!text) {
+    throw makeError(400, `${label} fehlt.`);
+  }
+
+  return text;
 }
 
-function cleanText(value) {
+function optional(value) {
   const text = String(value ?? "").trim();
   return text || null;
 }
 
-function formatOrder(order) {
-  const files = Array.isArray(order.order_files) ? order.order_files : [];
+function createOrderNumber() {
+  const now = new Date();
 
-  return {
-    ...order,
-    status_label: STATUS_LABELS[order.status] || order.status,
-    files,
-    order_files: undefined
-  };
+  const date =
+    now.getUTCFullYear() +
+    String(now.getUTCMonth() + 1).padStart(2, "0") +
+    String(now.getUTCDate()).padStart(2, "0");
+
+  const random = Math.random()
+    .toString(36)
+    .slice(2, 8)
+    .toUpperCase();
+
+  return `TS-${date}-${random}`;
 }
 
-function handleError(error) {
-  console.error("Fehler in der Function orders:", error);
+async function createOrder(event, supabase, user) {
+  const input = parseJson(event);
 
-  const statusCode = Number(error?.statusCode) || 500;
-  const publicMessage =
-    statusCode >= 500
-      ? "Interner Serverfehler"
-      : error?.message || "Unbekannter Fehler";
+  /*
+   * Diese Prüfung läuft unmittelbar vor dem Insert.
+   * Dadurch kann customer_id nicht unbemerkt null werden.
+   */
+  if (!user.customerId) {
+    throw makeError(
+      500,
+      "Interner Fehler: customerId ist vor dem Speichern leer."
+    );
+  }
 
-  return json(statusCode, {
-    error: publicMessage,
-    details: error?.message || String(error)
+  const orderToInsert = {
+    order_number: createOrderNumber(),
+    customer_id: user.customerId,
+    customer_email: user.email,
+    package_name: required(
+      input.package_name ?? input.paket,
+      "Das gewünschte Paket"
+    ),
+    status: "received",
+    desired_date: optional(
+      input.desired_date ?? input.datum
+    ),
+    street: required(
+      input.street ?? input.strasse,
+      "Die Strasse"
+    ),
+    postal_code: required(
+      input.postal_code ?? input.plz,
+      "Die Postleitzahl"
+    ),
+    city: required(
+      input.city ?? input.ort,
+      "Der Ort"
+    ),
+    customer_message: optional(
+      input.customer_message ?? input.nachricht
+    ),
+    admin_message: null,
+  };
+
+  console.log("ORDERS VERSION: 2026-07-16-IDENTITY-FIX");
+  console.log("Speichere Bestellung für customer_id:", user.customerId);
+
+  const { data, error } = await supabase
+    .from("orders")
+    .insert(orderToInsert)
+    .select("*")
+    .single();
+
+  if (error) {
+    throw new Error(
+      `Bestellung konnte nicht gespeichert werden: ${error.message}`
+    );
+  }
+
+  return send(201, {
+    ok: true,
+    message: "Bestellung erfolgreich gespeichert.",
+    order: data,
+  });
+}
+
+async function listOrders(event, supabase, user) {
+  let query = supabase
+    .from("orders")
+    .select(`
+      *,
+      order_files (
+        id,
+        order_id,
+        file_name,
+        storage_path,
+        mime_type,
+        size_bytes,
+        created_at
+      )
+    `)
+    .order("created_at", { ascending: false });
+
+  if (!user.isAdmin) {
+    query = query.eq("customer_id", user.customerId);
+  }
+
+  const id = optional(event.queryStringParameters?.id);
+  if (id) query = query.eq("id", id);
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw new Error(
+      `Bestellungen konnten nicht geladen werden: ${error.message}`
+    );
+  }
+
+  return send(200, {
+    ok: true,
+    orders: data || [],
+  });
+}
+
+async function updateOrder(event, supabase, user) {
+  if (!user.isAdmin) {
+    throw makeError(
+      403,
+      "Nur Administratoren dürfen Bestellungen bearbeiten."
+    );
+  }
+
+  const input = parseJson(event);
+  const orderId = required(
+    input.id ?? input.order_id,
+    "Die Bestell-ID"
+  );
+
+  const updates = {};
+
+  if (input.status !== undefined) {
+    updates.status = required(input.status, "Der Status");
+  }
+
+  if (input.admin_message !== undefined) {
+    updates.admin_message = optional(input.admin_message);
+  }
+
+  updates.updated_at = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("orders")
+    .update(updates)
+    .eq("id", orderId)
+    .select("*")
+    .single();
+
+  if (error) {
+    throw new Error(
+      `Bestellung konnte nicht aktualisiert werden: ${error.message}`
+    );
+  }
+
+  return send(200, {
+    ok: true,
+    order: data,
   });
 }
 
 exports.handler = async function handler(event, context) {
-  if (event.httpMethod === "OPTIONS") {
-    return {
-      statusCode: 204,
-      headers: RESPONSE_HEADERS,
-      body: ""
-    };
-  }
-
   try {
-    const currentUser = getUser(context);
-    const isAdmin = getRoles(currentUser).includes("admin");
+    if (event.httpMethod === "OPTIONS") {
+      return {
+        statusCode: 204,
+        headers: HEADERS,
+        body: "",
+      };
+    }
+
+    const user = getIdentityUser(event, context);
     const supabase = getSupabase();
 
     if (event.httpMethod === "GET") {
-      const wantsAllOrders =
-        event.queryStringParameters?.scope === "all" && isAdmin;
-
-      let query = supabase
-        .from("orders")
-        .select(
-          `
-            *,
-            order_files (
-              id,
-              original_name,
-              mime_type,
-              size_bytes,
-              created_at
-            )
-          `
-        )
-        .order("created_at", { ascending: false });
-
-      if (!wantsAllOrders) {
-        query = query.eq("customer_id", currentUser.id);
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        throw new Error(`Bestellungen konnten nicht geladen werden: ${error.message}`);
-      }
-
-      return json(200, {
-        orders: (data || []).map(formatOrder)
-      });
+      return await listOrders(event, supabase, user);
     }
 
     if (event.httpMethod === "POST") {
-      const requestBody = parseBody(event);
-      const packageName = cleanText(requestBody.package_name);
-
-      if (!packageName) {
-        throw httpError(400, "Bitte eine Leistung auswählen.");
-      }
-
-      const newOrder = {
-        order_number: createOrderNumber(),
-        customer_id: currentUser.id,
-        customer_email: currentUser.email,
-        package_name: packageName,
-        status: "received",
-        desired_date: requestBody.desired_date || null,
-        street: cleanText(requestBody.street),
-        postal_code: cleanText(requestBody.postal_code),
-        city: cleanText(requestBody.city),
-        customer_message: cleanText(requestBody.customer_message),
-        admin_message: null
-      };
-
-      const { data, error } = await supabase
-        .from("orders")
-        .insert(newOrder)
-        .select()
-        .single();
-
-      if (error) {
-        throw new Error(`Bestellung konnte nicht gespeichert werden: ${error.message}`);
-      }
-
-      return json(201, {
-        message: "Bestellung wurde gespeichert.",
-        order: formatOrder(data)
-      });
+      return await createOrder(event, supabase, user);
     }
 
-    if (event.httpMethod === "PATCH") {
-      requireAdmin(context);
-
-      const requestBody = parseBody(event);
-      const orderId = cleanText(requestBody.id);
-      const status = cleanText(requestBody.status);
-
-      if (!orderId) {
-        throw httpError(400, "Die Bestell-ID fehlt.");
-      }
-
-      if (!status || !ALLOWED_STATUSES.includes(status)) {
-        throw httpError(400, "Der ausgewählte Bestellstatus ist ungültig.");
-      }
-
-      const update = {
-        status,
-        admin_message: cleanText(requestBody.admin_message),
-        updated_at: new Date().toISOString()
-      };
-
-      const { data, error } = await supabase
-        .from("orders")
-        .update(update)
-        .eq("id", orderId)
-        .select()
-        .single();
-
-      if (error) {
-        throw new Error(`Bestellung konnte nicht aktualisiert werden: ${error.message}`);
-      }
-
-      return json(200, {
-        message: "Bestellung wurde aktualisiert.",
-        order: formatOrder(data)
-      });
+    if (
+      event.httpMethod === "PATCH" ||
+      event.httpMethod === "PUT"
+    ) {
+      return await updateOrder(event, supabase, user);
     }
 
-    throw httpError(405, "Diese Anfragemethode ist nicht erlaubt.");
+    throw makeError(
+      405,
+      `HTTP-Methode ${event.httpMethod} wird nicht unterstützt.`
+    );
   } catch (error) {
-    return handleError(error);
+    console.error("Fehler in der Function orders:", error);
+
+    const statusCode = Number(error?.statusCode) || 500;
+
+    return send(statusCode, {
+      error:
+        statusCode === 500
+          ? "Interner Serverfehler"
+          : error?.message || "Fehler",
+      details: error?.message || String(error),
+    });
   }
 };
+'''
+
+path = Path("/mnt/data/orders-context-fix.js")
+path.write_text(code, encoding="utf-8")
+print(path)

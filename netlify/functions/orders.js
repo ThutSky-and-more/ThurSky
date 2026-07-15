@@ -1,44 +1,32 @@
-from pathlib import Path
+const { createClient } = require("@supabase/supabase-js");
 
-code = r'''const { createClient } = require("@supabase/supabase-js");
+const VERSION = "2026-07-16-ORDERS-FIX-V3";
 
-/**
- * ThurSky – Netlify Function: orders
- *
- * Datei:
- * netlify/functions/orders.js
- *
- * Benötigte Netlify-Variablen:
- * SUPABASE_URL
- * SUPABASE_SERVICE_ROLE_KEY
- *
- * Diese Version prüft das Netlify-Identity-Token direkt über
- * /.netlify/identity/user und verwendet die bestätigte Benutzer-ID.
- */
-
-const VERSION = "2026-07-16-TOKEN-VERIFY-V1";
-
-const RESPONSE_HEADERS = {
+const HEADERS = {
   "content-type": "application/json; charset=utf-8",
   "cache-control": "no-store",
 };
 
+/* =========================================================
+   ALLGEMEINE HILFSFUNKTIONEN
+========================================================= */
+
 function json(statusCode, payload) {
   return {
     statusCode,
-    headers: RESPONSE_HEADERS,
+    headers: HEADERS,
     body: JSON.stringify(payload),
   };
 }
 
-function createHttpError(statusCode, message) {
+function httpError(statusCode, message) {
   const error = new Error(message);
   error.statusCode = statusCode;
   return error;
 }
 
 function handleError(error) {
-  console.error(`[orders ${VERSION}]`, error);
+  console.error(`[orders ${VERSION}] Fehler:`, error);
 
   const statusCode = Number(error?.statusCode) || 500;
 
@@ -60,7 +48,7 @@ function parseBody(event) {
   try {
     return JSON.parse(event.body);
   } catch {
-    throw createHttpError(400, "Die übertragenen Daten sind ungültig.");
+    throw httpError(400, "Die übertragenen Daten sind ungültig.");
   }
 }
 
@@ -68,7 +56,7 @@ function requiredText(value, label) {
   const text = String(value ?? "").trim();
 
   if (!text) {
-    throw createHttpError(400, `${label} fehlt.`);
+    throw httpError(400, `${label} fehlt.`);
   }
 
   return text;
@@ -79,6 +67,10 @@ function optionalText(value) {
   return text || null;
 }
 
+/* =========================================================
+   NETLIFY IDENTITY
+========================================================= */
+
 function getBearerToken(event) {
   const authorization =
     event.headers?.authorization ||
@@ -88,7 +80,7 @@ function getBearerToken(event) {
   const match = authorization.match(/^Bearer\s+(.+)$/i);
 
   if (!match?.[1]) {
-    throw createHttpError(
+    throw httpError(
       401,
       "Bitte zuerst anmelden. Es wurde kein Login-Token übertragen."
     );
@@ -98,31 +90,28 @@ function getBearerToken(event) {
 }
 
 function getSiteOrigin(event) {
-  const forwardedHost =
+  const host =
     event.headers?.["x-forwarded-host"] ||
     event.headers?.host;
 
-  const forwardedProto =
+  const protocol =
     event.headers?.["x-forwarded-proto"] ||
     "https";
 
-  if (!forwardedHost) {
-    throw createHttpError(
+  if (!host) {
+    throw httpError(
       500,
-      "Die Website-Adresse konnte in der Function nicht ermittelt werden."
+      "Die Website-Adresse konnte nicht ermittelt werden."
     );
   }
 
-  return `${forwardedProto}://${forwardedHost}`;
+  return `${protocol}://${host}`;
 }
 
-/**
- * Prüft das übertragene Token direkt bei Netlify Identity.
- * Die Antwort enthält unter anderem id, email und app_metadata.
- */
 async function getVerifiedIdentityUser(event) {
   const token = getBearerToken(event);
   const origin = getSiteOrigin(event);
+
   const identityUrl = `${origin}/.netlify/identity/user`;
 
   const identityResponse = await fetch(identityUrl, {
@@ -148,9 +137,9 @@ async function getVerifiedIdentityUser(event) {
       identityData
     );
 
-    throw createHttpError(
+    throw httpError(
       401,
-      "Deine Anmeldung ist abgelaufen oder konnte nicht bestätigt werden. Bitte melde dich neu an."
+      "Deine Anmeldung konnte nicht bestätigt werden. Bitte melde dich neu an."
     );
   }
 
@@ -168,18 +157,18 @@ async function getVerifiedIdentityUser(event) {
 
   if (!customerId) {
     console.error(
-      `[orders ${VERSION}] Identity-Antwort ohne Benutzer-ID:`,
+      `[orders ${VERSION}] Keine Benutzer-ID gefunden:`,
       JSON.stringify(identityData)
     );
 
-    throw createHttpError(
+    throw httpError(
       500,
       "Netlify Identity hat keine Benutzer-ID zurückgegeben."
     );
   }
 
   if (!email) {
-    throw createHttpError(
+    throw httpError(
       400,
       "Netlify Identity hat keine E-Mail-Adresse zurückgegeben."
     );
@@ -195,36 +184,51 @@ async function getVerifiedIdentityUser(event) {
     customerId: String(customerId),
     email: String(email),
     roles: Array.isArray(roles) ? roles : [],
-    isAdmin: Array.isArray(roles) && roles.includes("admin"),
+    isAdmin:
+      Array.isArray(roles) &&
+      roles.includes("admin"),
   };
 }
 
-function getSupabaseClient() {
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+function getSupabase() {
   const supabaseUrl = process.env.SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceRoleKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl) {
-    throw createHttpError(
+    throw httpError(
       500,
       "SUPABASE_URL fehlt in den Netlify-Umgebungsvariablen."
     );
   }
 
-  if (!serviceKey) {
-    throw createHttpError(
+  if (!serviceRoleKey) {
+    throw httpError(
       500,
       "SUPABASE_SERVICE_ROLE_KEY fehlt in den Netlify-Umgebungsvariablen."
     );
   }
 
-  return createClient(supabaseUrl, serviceKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-    },
-  });
+  return createClient(
+    supabaseUrl,
+    serviceRoleKey,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    }
+  );
 }
+
+/* =========================================================
+   BESTELLNUMMER
+========================================================= */
 
 function createOrderNumber() {
   const now = new Date();
@@ -242,72 +246,9 @@ function createOrderNumber() {
   return `TS-${datePart}-${randomPart}`;
 }
 
-async function createOrder(event, supabase, user) {
-  const input = parseBody(event);
-
-  const orderToInsert = {
-    order_number: createOrderNumber(),
-
-    // Diese Werte stammen aus der geprüften Netlify-Identity-Antwort.
-    customer_id: requiredText(
-      user.customerId,
-      "Die bestätigte Benutzer-ID"
-    ),
-    customer_email: requiredText(
-      user.email,
-      "Die bestätigte E-Mail-Adresse"
-    ),
-
-    package_name: requiredText(
-      input.package_name ?? input.paket,
-      "Das gewünschte Paket"
-    ),
-    status: "received",
-    desired_date: optionalText(
-      input.desired_date ?? input.datum
-    ),
-    street: requiredText(
-      input.street ?? input.strasse,
-      "Die Strasse"
-    ),
-    postal_code: requiredText(
-      input.postal_code ?? input.plz,
-      "Die Postleitzahl"
-    ),
-    city: requiredText(
-      input.city ?? input.ort,
-      "Der Ort"
-    ),
-    customer_message: optionalText(
-      input.customer_message ?? input.nachricht
-    ),
-    admin_message: null,
-  };
-
-  console.log(`[orders ${VERSION}] Function aktiv`);
-  console.log(
-    `[orders ${VERSION}] Speichere Bestellung für customer_id=${orderToInsert.customer_id}`
-  );
-
-  const { data, error } = await supabase
-    .from("orders")
-    .insert(orderToInsert)
-    .select("*")
-    .single();
-
-  if (error) {
-    throw new Error(
-      `Bestellung konnte nicht gespeichert werden: ${error.message}`
-    );
-  }
-
-  return json(201, {
-    ok: true,
-    message: "Deine Bestellung wurde erfolgreich gespeichert.",
-    order: data,
-    version: VERSION,
-  });
-}
+/* =========================================================
+   BESTELLUNGEN LADEN
+========================================================= */
 
 async function listOrders(event, supabase, user) {
   let query = supabase
@@ -324,10 +265,19 @@ async function listOrders(event, supabase, user) {
         created_at
       )
     `)
-    .order("created_at", { ascending: false });
+    .order("created_at", {
+      ascending: false,
+    });
 
+  /*
+   * Normale Kunden sehen nur ihre eigenen Bestellungen.
+   * Admins sehen alle Bestellungen.
+   */
   if (!user.isAdmin) {
-    query = query.eq("customer_id", user.customerId);
+    query = query.eq(
+      "customer_id",
+      user.customerId
+    );
   }
 
   const requestedId = optionalText(
@@ -353,9 +303,109 @@ async function listOrders(event, supabase, user) {
   });
 }
 
-async function updateOrder(event, supabase, user) {
+/* =========================================================
+   BESTELLUNG ERSTELLEN
+========================================================= */
+
+async function createOrder(event, supabase, user) {
+  const input = parseBody(event);
+
+  /*
+   * customer_id und customer_email werden nicht aus dem
+   * Formular übernommen. Sie stammen aus dem geprüften
+   * Netlify-Identity-Benutzer.
+   */
+  const order = {
+    order_number: createOrderNumber(),
+
+    customer_id: requiredText(
+      user.customerId,
+      "Die Benutzer-ID"
+    ),
+
+    customer_email: requiredText(
+      user.email,
+      "Die E-Mail-Adresse"
+    ),
+
+    package_name: requiredText(
+      input.package_name ?? input.paket,
+      "Das gewünschte Paket"
+    ),
+
+    status: "received",
+
+    desired_date: optionalText(
+      input.desired_date ?? input.datum
+    ),
+
+    street: requiredText(
+      input.street ?? input.strasse,
+      "Die Strasse"
+    ),
+
+    postal_code: requiredText(
+      input.postal_code ?? input.plz,
+      "Die Postleitzahl"
+    ),
+
+    city: requiredText(
+      input.city ?? input.ort,
+      "Der Ort"
+    ),
+
+    customer_message: optionalText(
+      input.customer_message ??
+        input.nachricht
+    ),
+
+    admin_message: null,
+  };
+
+  console.log(
+    `[orders ${VERSION}] Neue Bestellung`
+  );
+
+  console.log(
+    `[orders ${VERSION}] customer_id=${order.customer_id}`
+  );
+
+  console.log(
+    `[orders ${VERSION}] customer_email=${order.customer_email}`
+  );
+
+  const { data, error } = await supabase
+    .from("orders")
+    .insert(order)
+    .select("*")
+    .single();
+
+  if (error) {
+    throw new Error(
+      `Bestellung konnte nicht gespeichert werden: ${error.message}`
+    );
+  }
+
+  return json(201, {
+    ok: true,
+    message:
+      "Deine Bestellung wurde erfolgreich gespeichert.",
+    order: data,
+    version: VERSION,
+  });
+}
+
+/* =========================================================
+   BESTELLUNG AKTUALISIEREN
+========================================================= */
+
+async function updateOrder(
+  event,
+  supabase,
+  user
+) {
   if (!user.isAdmin) {
-    throw createHttpError(
+    throw httpError(
       403,
       "Nur Administratoren dürfen Bestellungen bearbeiten."
     );
@@ -382,10 +432,13 @@ async function updateOrder(event, supabase, user) {
   const updates = {};
 
   if (input.status !== undefined) {
-    const status = requiredText(input.status, "Der Status");
+    const status = requiredText(
+      input.status,
+      "Der Status"
+    );
 
     if (!allowedStatuses.includes(status)) {
-      throw createHttpError(
+      throw httpError(
         400,
         `Ungültiger Status: ${status}`
       );
@@ -395,7 +448,9 @@ async function updateOrder(event, supabase, user) {
   }
 
   if (input.admin_message !== undefined) {
-    updates.admin_message = optionalText(input.admin_message);
+    updates.admin_message = optionalText(
+      input.admin_message
+    );
   }
 
   if (input.package_name !== undefined) {
@@ -406,17 +461,38 @@ async function updateOrder(event, supabase, user) {
   }
 
   if (input.desired_date !== undefined) {
-    updates.desired_date = optionalText(input.desired_date);
+    updates.desired_date = optionalText(
+      input.desired_date
+    );
+  }
+
+  if (input.street !== undefined) {
+    updates.street = optionalText(
+      input.street
+    );
+  }
+
+  if (input.postal_code !== undefined) {
+    updates.postal_code = optionalText(
+      input.postal_code
+    );
+  }
+
+  if (input.city !== undefined) {
+    updates.city = optionalText(
+      input.city
+    );
   }
 
   if (Object.keys(updates).length === 0) {
-    throw createHttpError(
+    throw httpError(
       400,
       "Es wurden keine Änderungen übertragen."
     );
   }
 
-  updates.updated_at = new Date().toISOString();
+  updates.updated_at =
+    new Date().toISOString();
 
   const { data, error } = await supabase
     .from("orders")
@@ -433,21 +509,32 @@ async function updateOrder(event, supabase, user) {
 
   return json(200, {
     ok: true,
-    message: "Die Bestellung wurde aktualisiert.",
+    message:
+      "Die Bestellung wurde aktualisiert.",
     order: data,
     version: VERSION,
   });
 }
 
-async function deleteOrder(event, supabase, user) {
+/* =========================================================
+   BESTELLUNG LÖSCHEN
+========================================================= */
+
+async function deleteOrder(
+  event,
+  supabase,
+  user
+) {
   if (!user.isAdmin) {
-    throw createHttpError(
+    throw httpError(
       403,
       "Nur Administratoren dürfen Bestellungen löschen."
     );
   }
 
-  const input = event.body ? parseBody(event) : {};
+  const input = event.body
+    ? parseBody(event)
+    : {};
 
   const orderId = requiredText(
     event.queryStringParameters?.id ??
@@ -455,6 +542,25 @@ async function deleteOrder(event, supabase, user) {
       input.order_id,
     "Die Bestell-ID"
   );
+
+  /*
+   * Zuerst Dateieinträge entfernen.
+   * Die eigentlichen Storage-Dateien werden von der
+   * separaten Datei-Function behandelt.
+   */
+  const {
+    error: fileDeleteError,
+  } = await supabase
+    .from("order_files")
+    .delete()
+    .eq("order_id", orderId);
+
+  if (fileDeleteError) {
+    console.warn(
+      `[orders ${VERSION}] Dateieinträge konnten nicht gelöscht werden:`,
+      fileDeleteError.message
+    );
+  }
 
   const { error } = await supabase
     .from("orders")
@@ -469,42 +575,73 @@ async function deleteOrder(event, supabase, user) {
 
   return json(200, {
     ok: true,
-    message: "Die Bestellung wurde gelöscht.",
+    message:
+      "Die Bestellung wurde gelöscht.",
     version: VERSION,
   });
 }
 
+/* =========================================================
+   HAUPTFUNKTION
+========================================================= */
+
 exports.handler = async function handler(event) {
   try {
-    console.log(`[orders ${VERSION}] ${event.httpMethod}`);
+    console.log(
+      `[orders ${VERSION}] ${event.httpMethod}`
+    );
 
     if (event.httpMethod === "OPTIONS") {
       return {
         statusCode: 204,
-        headers: RESPONSE_HEADERS,
+        headers: HEADERS,
         body: "",
       };
     }
 
-    const user = await getVerifiedIdentityUser(event);
-    const supabase = getSupabaseClient();
+    /*
+     * Benutzer direkt über Netlify Identity prüfen.
+     */
+    const user =
+      await getVerifiedIdentityUser(event);
+
+    /*
+     * Supabase-Client mit Service-Key erstellen.
+     */
+    const supabase = getSupabase();
 
     switch (event.httpMethod) {
       case "GET":
-        return await listOrders(event, supabase, user);
+        return await listOrders(
+          event,
+          supabase,
+          user
+        );
 
       case "POST":
-        return await createOrder(event, supabase, user);
+        return await createOrder(
+          event,
+          supabase,
+          user
+        );
 
       case "PATCH":
       case "PUT":
-        return await updateOrder(event, supabase, user);
+        return await updateOrder(
+          event,
+          supabase,
+          user
+        );
 
       case "DELETE":
-        return await deleteOrder(event, supabase, user);
+        return await deleteOrder(
+          event,
+          supabase,
+          user
+        );
 
       default:
-        throw createHttpError(
+        throw httpError(
           405,
           `Die HTTP-Methode ${event.httpMethod} wird nicht unterstützt.`
         );
@@ -513,8 +650,3 @@ exports.handler = async function handler(event) {
     return handleError(error);
   }
 };
-'''
-
-path = Path("/mnt/data/orders.js")
-path.write_text(code, encoding="utf-8")
-print(path)

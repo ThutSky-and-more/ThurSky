@@ -1,6 +1,6 @@
 const { createClient } = require("@supabase/supabase-js");
 
-const VERSION = "2026-07-16-ORDERS-FIX-V3";
+const VERSION = "2026-07-16-ORDERS-FIX-V4";
 
 const HEADERS = {
   "content-type": "application/json; charset=utf-8",
@@ -112,15 +112,16 @@ async function getVerifiedIdentityUser(event) {
   const token = getBearerToken(event);
   const origin = getSiteOrigin(event);
 
-  const identityUrl = `${origin}/.netlify/identity/user`;
-
-  const identityResponse = await fetch(identityUrl, {
-    method: "GET",
-    headers: {
-      authorization: `Bearer ${token}`,
-      accept: "application/json",
-    },
-  });
+  const identityResponse = await fetch(
+    `${origin}/.netlify/identity/user`,
+    {
+      method: "GET",
+      headers: {
+        authorization: `Bearer ${token}`,
+        accept: "application/json",
+      },
+    }
+  );
 
   let identityData = null;
 
@@ -251,27 +252,25 @@ function createOrderNumber() {
 ========================================================= */
 
 async function listOrders(event, supabase, user) {
+  console.log(
+    `[orders ${VERSION}] Lade Bestellungen für ${user.email}, admin=${user.isAdmin}`
+  );
+
+  /*
+   * Wichtig:
+   * Hier wird absichtlich nur die Tabelle "orders" geladen.
+   * Die Tabelle "order_files" wird später separat behandelt.
+   */
   let query = supabase
     .from("orders")
-    .select(`
-      *,
-      order_files (
-        id,
-        order_id,
-        file_name,
-        storage_path,
-        mime_type,
-        size_bytes,
-        created_at
-      )
-    `)
+    .select("*")
     .order("created_at", {
       ascending: false,
     });
 
   /*
-   * Normale Kunden sehen nur ihre eigenen Bestellungen.
-   * Admins sehen alle Bestellungen.
+   * Kunden sehen nur ihre eigenen Bestellungen.
+   * Administratoren sehen alle Bestellungen.
    */
   if (!user.isAdmin) {
     query = query.eq(
@@ -291,6 +290,11 @@ async function listOrders(event, supabase, user) {
   const { data, error } = await query;
 
   if (error) {
+    console.error(
+      `[orders ${VERSION}] Supabase-Fehler beim Laden:`,
+      error
+    );
+
     throw new Error(
       `Bestellungen konnten nicht geladen werden: ${error.message}`
     );
@@ -310,11 +314,6 @@ async function listOrders(event, supabase, user) {
 async function createOrder(event, supabase, user) {
   const input = parseBody(event);
 
-  /*
-   * customer_id und customer_email werden nicht aus dem
-   * Formular übernommen. Sie stammen aus dem geprüften
-   * Netlify-Identity-Benutzer.
-   */
   const order = {
     order_number: createOrderNumber(),
 
@@ -356,7 +355,7 @@ async function createOrder(event, supabase, user) {
 
     customer_message: optionalText(
       input.customer_message ??
-        input.nachricht
+      input.nachricht
     ),
 
     admin_message: null,
@@ -538,29 +537,10 @@ async function deleteOrder(
 
   const orderId = requiredText(
     event.queryStringParameters?.id ??
-      input.id ??
-      input.order_id,
+    input.id ??
+    input.order_id,
     "Die Bestell-ID"
   );
-
-  /*
-   * Zuerst Dateieinträge entfernen.
-   * Die eigentlichen Storage-Dateien werden von der
-   * separaten Datei-Function behandelt.
-   */
-  const {
-    error: fileDeleteError,
-  } = await supabase
-    .from("order_files")
-    .delete()
-    .eq("order_id", orderId);
-
-  if (fileDeleteError) {
-    console.warn(
-      `[orders ${VERSION}] Dateieinträge konnten nicht gelöscht werden:`,
-      fileDeleteError.message
-    );
-  }
 
   const { error } = await supabase
     .from("orders")
@@ -599,15 +579,9 @@ exports.handler = async function handler(event) {
       };
     }
 
-    /*
-     * Benutzer direkt über Netlify Identity prüfen.
-     */
     const user =
       await getVerifiedIdentityUser(event);
 
-    /*
-     * Supabase-Client mit Service-Key erstellen.
-     */
     const supabase = getSupabase();
 
     switch (event.httpMethod) {

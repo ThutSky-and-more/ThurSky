@@ -4,22 +4,43 @@ backend:
 
 locale: de
 publish_mode: simple
-media_folder: "assets/images/news"
-public_folder: "/assets/images/news"
+media_folder: "assets/images/uploads"
+public_folder: "/assets/images/uploads"
 
 collections:
+  - name: "gallery"
+    label: "Galerie"
+    files:
+      - name: "gallery"
+        label: "Galerie-Bilder"
+        file: "content/gallery.json"
+        format: "json"
+        fields:
+          - label: "Bilder"
+            name: "images"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "Bild", name: "image", widget: "image" }
+              - { label: "Titel", name: "title", widget: "string" }
+              - { label: "Alternativtext", name: "alt", widget: "string", hint: "Beschreibt das Bild für Suchmaschinen und Bildschirmleser." }
+              - { label: "Bildunterschrift", name: "caption", widget: "text", required: false }
   - name: "news"
     label: "News"
-    label_singular: "News-Beitrag"
-    folder: "content/news"
-    create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
-    summary: "{{title}} – {{date}}"
-    sortable_fields: ["date", "title"]
-    fields:
-      - { label: "Titel", name: "title", widget: "string" }
-      - { label: "Veröffentlichungsdatum", name: "date", widget: "datetime", format: "YYYY-MM-DDTHH:mm:ssZ" }
-      - { label: "Kurzbeschreibung", name: "description", widget: "text" }
-      - { label: "Titelbild", name: "image", widget: "image", required: false }
-      - { label: "Veröffentlicht", name: "published", widget: "boolean", default: true }
-      - { label: "Inhalt", name: "body", widget: "markdown" }
+    files:
+      - name: "news"
+        label: "News-Beiträge"
+        file: "content/news.json"
+        format: "json"
+        fields:
+          - label: "Beiträge"
+            name: "posts"
+            widget: "list"
+            summary: "{{fields.title}} – {{fields.date}}"
+            fields:
+              - { label: "Titel", name: "title", widget: "string" }
+              - { label: "Datum", name: "date", widget: "datetime", format: "YYYY-MM-DDTHH:mm:ssZ" }
+              - { label: "Kurzbeschreibung", name: "description", widget: "text" }
+              - { label: "Titelbild", name: "image", widget: "image", required: false }
+              - { label: "Inhalt", name: "body", widget: "text" }
+              - { label: "Veröffentlicht", name: "published", widget: "boolean", default: true }

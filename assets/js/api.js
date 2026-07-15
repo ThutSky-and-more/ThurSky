@@ -1,16 +1,12 @@
-export async function api(path, options = {}) {
-  const user = window.netlifyIdentity?.currentUser();
-  const token = user ? await user.jwt() : null;
-  const headers = new Headers(options.headers || {});
-  if (token) headers.set("Authorization", `Bearer ${token}`);
-  if (options.body && !(options.body instanceof FormData)) headers.set("Content-Type", "application/json");
-  const response = await fetch(`/api/${path}`, { ...options, headers });
-  const type = response.headers.get("content-type") || "";
-  const payload = type.includes("application/json") ? await response.json() : await response.text();
-  if (!response.ok) throw new Error(payload?.error || payload || `HTTP ${response.status}`);
-  return payload;
-}
-
-export function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>'"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"})[c]);
-}
+window.ThurSkyApi={
+ async request(path,options={}){
+   const token=await window.ThurSkyAuth?.jwt();
+   const headers={...(options.headers||{})};
+   if(token)headers.authorization=`Bearer ${token}`;
+   if(options.body && !(options.body instanceof FormData) && !headers['content-type'])headers['content-type']='application/json';
+   const r=await fetch(path,{...options,headers});
+   const data=await r.json().catch(()=>({}));
+   if(!r.ok)throw new Error(data.error||data.details||`HTTP ${r.status}`);
+   return data;
+ }
+};

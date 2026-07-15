@@ -823,36 +823,3 @@ function renderPost(post) {
   </main>
 </body>
 </html>`;
-}
-
-function formatDate(value) {
-  return new Intl.DateTimeFormat("de-CH", {
-    dateStyle: "long",
-  }).format(new Date(value));
-}
-
-function escapeHtml(value) {
-  return String(value ?? "").replace(
-    /[&<>'"]/g,
-    (character) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        "'": "&#39;",
-        '"': "&quot;",
-      })[character]
-  );
-}
-'''
-
-(base / "news" / "index.html").write_text(news_html, encoding="utf-8")
-(base / "scripts" / "build-news.mjs").write_text(build_script, encoding="utf-8")
-
-zip_path = Path("/mnt/data/thursky-news-variante2.zip")
-with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
-    for p in base.rglob("*"):
-        if p.is_file():
-            z.write(p, p.relative_to(base))
-
-print(zip_path)

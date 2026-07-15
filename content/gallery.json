@@ -1,6 +1,9 @@
 {
   "images": [
-    {"image":"/assets/images/gallery/BildPool.jpg","title":"ThurSky Bildpool","alt":"Übersicht verschiedener Drohnenaufnahmen","caption":"Auswahl unserer Luftaufnahmen"},
-    {"image":"/assets/images/gallery/DJI_0005.JPG","title":"Drohnenaufnahme","alt":"Drohnenaufnahme aus dem Thurgau","caption":"Aufnahme aus der Vogelperspektive"}
+    {
+      "image": "/assets/images/uploads/dji_0454.jpg",
+      "title": "Bild Kirche",
+      "alt": "Kirche Alterswilen"
+    }
   ]
 }

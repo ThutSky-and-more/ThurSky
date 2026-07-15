@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bestellen | ThurSky</title>
+  <meta name="description" content="Unverbindliche Anfrage für Drohnenaufnahmen im Thurgau senden.">
+  <link rel="stylesheet" href="/assets/css/style.css">
+  
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="/" aria-label="ThurSky Startseite">
+    <img src="/assets/images/logo.png" alt="ThurSky Logo">
+  </a>
+  <button class="menu-toggle" id="menuToggle" type="button" aria-label="Menü öffnen" aria-expanded="false">☰</button>
+  <nav class="main-nav" id="mainNav" aria-label="Hauptnavigation">
+    <a href="/">Start</a>
+    <a href="/ueber-mich/">Ich &amp; Equipment</a>
+    <a href="/leistungen/">Leistungen</a>
+    <a href="/galerie/">Galerie</a>
+    <a href="/preise/">Preise</a>
+    <a href="/news/">News</a>
+    <a href="/bestellen/">Bestellen</a>
+    <a href="/kontakt/">Kontakt</a>
+    <a class="account-link" href="/konto/">Kundenkonto</a>
+  </nav>
+</header>
+<section class="subhero"><div><p class="hero-kicker">Unverbindlich</p><h1>Bestellung anfragen</h1></div></section>
+<main class="page-shell"><section class="content-section"><article class="box">
+  <h2>Unverbindliche Anfrage</h2>
+  <p>Damit Ihre Bestellung später im Kundenkonto erscheint, melden Sie sich vor dem Absenden an.</p>
+  <form id="orderForm">
+    <div id="orderLoginNotice" class="notice">Bitte melden Sie sich an, bevor Sie die Anfrage senden.</div>
+    <div class="form-grid">
+      <div class="field"><label for="package">Leistung *</label><select id="package" required><option value="">Bitte wählen</option><option>5 Luftbilder</option><option>Video</option><option>Foto + Video</option><option>Solarcheck</option><option>Feldkontrolle</option></select></div>
+      <div class="field"><label for="desiredDate">Wunschdatum</label><input id="desiredDate" type="date"></div>
+      <div class="field"><label for="street">Strasse *</label><input id="street" type="text" required minlength="3"></div>
+      <div class="field"><label for="postalCode">PLZ *</label><input id="postalCode" type="text" required pattern="[0-9]{4}" placeholder="8570"></div>
+      <div class="field"><label for="city">Ort *</label><input id="city" type="text" required minlength="2"></div>
+      <div class="field field-full"><label for="gps">GPS-Koordinaten</label><div class="inline-field"><input id="gps" type="text" readonly placeholder="Noch kein Standort übernommen"><button class="btn btn-light" id="getLocation" type="button">Standort übernehmen</button></div></div>
+      <div class="field field-full"><label for="message">Nachricht</label><textarea id="message" rows="5" placeholder="Ort, spezielle Wünsche, Kontaktzeit …"></textarea></div>
+    </div>
+    <div class="form-actions"><button class="btn btn-light" type="button" id="loginForOrder">Anmelden</button><button class="btn btn-primary" type="submit">Anfrage senden</button></div>
+    <div id="orderResult"></div>
+  </form>
+</article></section></main>
+<footer class="site-footer">
+  <div>ThurSky © <span id="year"></span> · <a href="/impressum.html">Impressum</a></div>
+  <a class="instagram-link" href="https://instagram.com/ThurSky.ch" target="_blank" rel="noopener">Instagram</a>
+</footer>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script type="module" src="/assets/js/main.js"></script>
+</body>
+</html>

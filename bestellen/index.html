@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bestellen | ThurSky</title><meta name="description" content="Drohnenaufnahme anfragen.">
-(()=>{const ni=window.netlifyIdentity,login=document.getElementById('orderLogin'),area=document.getElementById('orderArea'),result=document.getElementById('orderResult');if(!ni){result.textContent='Netlify Identity konnte nicht geladen werden.';result.classList.remove('hidden');return}ni.init();document.getElementById('loginBtn').onclick=()=>ni.open('login');document.getElementById('signupBtn').onclick=()=>ni.open('signup');const render=user=>{login.classList.toggle('hidden',!!user);area.classList.toggle('hidden',!user);if(user)document.getElementById('signedInAs').textContent='Angemeldet als '+user.email};ni.on('init',render);ni.on('login',u=>{ni.close();render(u)});ni.on('logout',()=>render(null));render(ni.currentUser());document.getElementById('orderForm').addEventListener('submit',async e=>{e.preventDefault();const user=ni.currentUser();if(!user){ni.open('login');return}result.className='notice';result.textContent='Anfrage wird gespeichert …';result.classList.remove('hidden');try{const token=await user.jwt();const r=await fetch('/.netlify/functions/orders',{method:'POST',headers:{'content-type':'application/json','authorization':'Bearer '+token},body:JSON.stringify({package_name:document.getElementById('package').value,desired_date:document.getElementById('date').value||null,street:document.getElementById('street').value,postal_code:document.getElementById('postal').value,city:document.getElementById('city').value,customer_message:document.getElementById('message').value})});const data=await r.json().catch(()=>({}));if(!r.ok)throw new Error(data.error||data.details||('HTTP '+r.status));result.className='notice success';result.textContent='Danke! Deine Anfrage '+(data.order?.order_number||'')+' wurde gespeichert.';e.target.reset()}catch(err){result.className='notice error';result.textContent='Fehler: '+err.message+' Prüfe bei Netlify unter Functions → orders → Logs die genaue Ursache.'}})})();
 <style>
 :root{--dark:#256c70;--dark2:#1d5558;--accent:#f5a623;--bg:#f3f3f3;--card:#fff;--text:#222;--muted:#555;--shadow:0 12px 25px rgba(0,0,0,.15)}
 *{box-sizing:border-box}html{min-height:100%}body{min-height:100vh;margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column}a{color:inherit}
@@ -14,11 +13,145 @@ main{width:min(1100px,100%);margin:0 auto;padding:34px 16px;flex:1}.view{animati
 .price-list{display:grid;gap:12px}.price-item{display:flex;justify-content:space-between;gap:18px;padding:14px 18px;border-radius:12px;background:rgba(245,166,35,.08);font-weight:600}.map{width:100%;height:320px;border:0;border-radius:18px}label{font-weight:650;display:block;margin-bottom:6px}input,select,textarea{width:100%;padding:13px 14px;margin-bottom:16px;border:1px solid #d5d5d5;border-radius:12px;font:inherit;background:#fff}input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px rgba(245,166,35,.2)}.form-grid{display:grid;grid-template-columns:1fr;gap:0 16px}.notice{padding:14px 16px;border-radius:12px;background:#eef8f8;border:1px solid #bfdede;color:#244}.notice.error{background:#fff1f1;border-color:#e5baba;color:#722}.notice.success{background:#eef8ef;border-color:#bcd9bf;color:#265d2b}.hidden{display:none!important}.login-card{text-align:center;max-width:680px;margin:0 auto}.login-card .actions{justify-content:center}.orders{display:grid;gap:14px}.order{padding:16px;border:1px solid #ddd;border-radius:14px;background:#fff}.status{display:inline-block;padding:5px 10px;border-radius:999px;background:#eef5f5;color:var(--dark2);font-weight:700;font-size:14px}
 .site-footer{background:var(--dark);color:#fff;text-align:center;padding:25px 18px;border-radius:30px 30px 0 0}.site-footer p{color:#fff;margin:0 0 8px}.site-footer a{color:#fff}.lightbox{display:none;position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.94);align-items:center;justify-content:center;padding:30px}.lightbox.open{display:flex}.lightbox img{max-width:92vw;max-height:88vh;border-radius:12px}.lightbox-close{position:absolute;top:15px;right:22px;background:none;border:0;color:#fff;font-size:42px;cursor:pointer}.lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.1);border:0;color:#fff;font-size:38px;padding:10px;cursor:pointer;border-radius:12px}.lightbox-prev{left:14px}.lightbox-next{right:14px}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}@media(max-width:759px){.hero{min-height:48vh}.hero.home{min-height:60vh}.hero-inner{padding:20px 16px}}@media(min-width:760px){.brand img{height:70px}.form-grid{grid-template-columns:repeat(2,1fr)}main{padding:40px 24px}.main-nav{top:94px}.gallery img{height:215px}}
-</style></head>
+</style>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
 <body><header class="site-header"><a class="brand" href="/" aria-label="ThurSky Startseite"><img src="/assets/images/logo.png" onerror="this.onerror=null;this.src='/logo.png'" alt="ThurSky Logo"></a><button class="menu-toggle" id="menuToggle" aria-controls="mainNav" aria-expanded="false" aria-label="Menü öffnen">☰</button><nav class="main-nav" id="mainNav" aria-label="Hauptnavigation"><a href="/">Start</a><a href="/ueber-mich/">Ich & Equipment</a><a href="/leistungen/">Leistungen</a><a href="/galerie/">Galerie</a><a href="/preise/">Preise</a><a href="/news/">News</a><a href="/bestellen/" aria-current="page">Bestellen</a><a href="/kontakt/">Kontakt</a><a class="account-link" href="/konto/">Kundenkonto</a></nav></header>
 <section class="hero home"><div class="hero-inner"><h1>Bestellen</h1><p>Anfrage direkt dem Kundenkonto zuordnen</p></div></section>
 <main><div class="view"><div class="back-row"><a class="button button-light" href="/">← Zurück zur Startseite</a></div><section class="box"><div id="orderLogin" class="login-card"><h2>Bitte zuerst anmelden</h2><p>Damit die Anfrage deinem Kundenkonto zugeordnet werden kann, musst du angemeldet sein.</p><div class="actions"><button class="button button-accent" id="loginBtn" type="button">Einloggen</button><button class="button" id="signupBtn" type="button">Konto erstellen</button></div></div><div id="orderArea" class="hidden"><h2>Unverbindliche Anfrage</h2><p id="signedInAs" class="notice"></p><form id="orderForm"><div class="form-grid"><div><label for="street">Strasse *</label><input id="street" required></div><div><label for="postal">PLZ *</label><input id="postal" inputmode="numeric" pattern="[0-9]{4}" required></div></div><label for="city">Ort *</label><input id="city" required><label for="package">Leistung *</label><select id="package" required><option value="">Bitte wählen</option><option>5 Luftbilder</option><option>Video</option><option>Foto + Video</option><option>Solarcheck</option><option>Feldkontrolle</option></select><label for="date">Wunschdatum</label><input id="date" type="date"><label for="message">Nachricht</label><textarea id="message" rows="5" placeholder="Ort, spezielle Wünsche, Kontaktzeit..."></textarea><button class="primary" type="submit">Anfrage im Kundenkonto speichern</button></form><p id="orderResult" class="notice hidden"></p></div></section></div></main>
 <footer class="site-footer"><p>ThurSky © 2026 · <a href="/impressum.html">Impressum</a></p><a href="https://instagram.com/ThurSky.ch" target="_blank" rel="noopener">Instagram</a></footer>
 <script>
-(function(){const btn=document.getElementById('menuToggle'),nav=document.getElementById('mainNav');if(!btn||!nav)return;const close=()=>{nav.classList.remove('open');btn.setAttribute('aria-expanded','false');btn.textContent='☰'};btn.addEventListener('click',e=>{e.stopPropagation();const open=nav.classList.toggle('open');btn.setAttribute('aria-expanded',String(open));btn.textContent=open?'✕':'☰'});nav.addEventListener('click',e=>{if(e.target.closest('a'))close()});document.addEventListener('click',e=>{if(!nav.contains(e.target)&&e.target!==btn)close()});document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});})();
-</script></body></html>
+(function () {
+  const button = document.getElementById('menuToggle');
+  const navigation = document.getElementById('mainNav');
+  if (!button || !navigation) return;
+
+  const closeMenu = () => {
+    navigation.classList.remove('open');
+    button.setAttribute('aria-expanded', 'false');
+    button.textContent = '☰';
+  };
+
+  button.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const isOpen = navigation.classList.toggle('open');
+    button.setAttribute('aria-expanded', String(isOpen));
+    button.textContent = isOpen ? '✕' : '☰';
+  });
+
+  navigation.addEventListener('click', (event) => {
+    if (event.target.closest('a')) closeMenu();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!navigation.contains(event.target) && event.target !== button) closeMenu();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeMenu();
+  });
+})();
+
+(function () {
+  const identity = window.netlifyIdentity;
+  const loginBox = document.getElementById('orderLogin');
+  const orderArea = document.getElementById('orderArea');
+  const result = document.getElementById('orderResult');
+  const loginButton = document.getElementById('loginBtn');
+  const signupButton = document.getElementById('signupBtn');
+  const orderForm = document.getElementById('orderForm');
+  const signedInAs = document.getElementById('signedInAs');
+
+  function showResult(message, type = '') {
+    result.className = `notice ${type}`.trim();
+    result.textContent = message;
+    result.classList.remove('hidden');
+  }
+
+  function render(user) {
+    const isLoggedIn = Boolean(user);
+    loginBox.classList.toggle('hidden', isLoggedIn);
+    orderArea.classList.toggle('hidden', !isLoggedIn);
+
+    if (isLoggedIn) {
+      signedInAs.textContent = `Angemeldet als ${user.email}`;
+      result.classList.add('hidden');
+    }
+  }
+
+  if (!identity) {
+    loginBox.classList.remove('hidden');
+    orderArea.classList.add('hidden');
+    loginBox.insertAdjacentHTML(
+      'beforeend',
+      '<p class="notice error">Netlify Identity konnte nicht geladen werden. Bitte Seite neu laden oder den Werbeblocker für diese Website deaktivieren.</p>'
+    );
+    return;
+  }
+
+  loginButton.addEventListener('click', () => identity.open('login'));
+  signupButton.addEventListener('click', () => identity.open('signup'));
+
+  identity.on('init', (user) => render(user));
+  identity.on('login', (user) => {
+    identity.close();
+    render(user);
+  });
+  identity.on('logout', () => render(null));
+  identity.on('error', (error) => {
+    console.error('Netlify Identity:', error);
+    showResult('Beim Login ist ein Fehler aufgetreten. Bitte versuche es erneut.', 'error');
+  });
+
+  identity.init();
+
+  // Falls der Benutzer bereits angemeldet ist, sofort anzeigen.
+  render(identity.currentUser());
+
+  orderForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const user = identity.currentUser();
+    if (!user) {
+      identity.open('login');
+      return;
+    }
+
+    showResult('Anfrage wird gespeichert …');
+
+    try {
+      const token = await user.jwt();
+      const response = await fetch('/.netlify/functions/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          package_name: document.getElementById('package').value,
+          desired_date: document.getElementById('date').value || null,
+          street: document.getElementById('street').value.trim(),
+          postal_code: document.getElementById('postal').value.trim(),
+          city: document.getElementById('city').value.trim(),
+          customer_message: document.getElementById('message').value.trim()
+        })
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || data.details || `HTTP ${response.status}`);
+      }
+
+      showResult(
+        `Danke! Deine Anfrage ${data.order?.order_number || ''} wurde gespeichert.`,
+        'success'
+      );
+      orderForm.reset();
+    } catch (error) {
+      console.error(error);
+      showResult(`Fehler: ${error.message}`, 'error');
+    }
+  });
+})();
+</script>
+</body></html>

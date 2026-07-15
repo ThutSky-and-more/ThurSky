@@ -1,0 +1,24 @@
+{
+  "name": "thursky-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-news.mjs",
+    "dev": "netlify dev"
+  },
+  "dependencies": {
+    "@netlify/identity": "^1.2.0",
+    "@supabase/supabase-js": "^2.110.5",
+    "@netlify/functions": "^5.3.0",
+    "gray-matter": "^4.0.3",
+    "marked": "^18.0.6",
+    "sanitize-html": "^2.17.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^23.8.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

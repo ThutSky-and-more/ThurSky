@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ThurSky Drohnenaufnahmen – Luftbilder und Videos im Thurgau</title>
+  <meta name="description" content="Drohnenaufnahmen im Thurgau: Luftbilder, Videos, Solar- und Dachaufnahmen sowie Immobilienaufnahmen.">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="/"><img src="/assets/images/logo.png" alt="ThurSky Logo"><span>ThurSky</span></a>
+  <button class="menu-toggle" id="menuToggle" aria-label="Menü öffnen">☰</button>
+  <nav class="desktop-nav" id="mainNav">
+    <a href="#start">Start</a><a href="#leistungen">Leistungen</a><a href="#galerie">Galerie</a><a href="#preise">Preise</a><a href="/news/">News</a><a href="#bestellen">Bestellen</a><a href="#kontakt">Kontakt</a><a href="/konto/">Kundenkonto</a>
+  </nav>
+</header>
+<section class="hero" id="start"><div class="hero-inner"><p class="eyebrow">Drohnenaufnahmen im Thurgau</p><h1>ThurSky</h1><p>Saubere und zuverlässige Luftbilder und Videos – schnell, persönlich und unkompliziert.</p><div class="hero-actions"><a class="btn btn-primary" href="#bestellen">Anfrage starten</a><a class="btn btn-secondary" href="/konto/">Kundenkonto</a></div></div></section>
+<main class="page-shell">
+  <section class="section grid grid-2">
+    <article class="card"><p class="eyebrow">Über ThurSky</p><h2>Ihre Drohnenaufnahme aus dem Thurgau</h2><p>Mit moderner Drohnentechnik erstellen wir Foto- und Videoaufnahmen für Privatpersonen, Landwirtschaft und kleinere Projekte.</p></article>
+    <article class="card"><p class="eyebrow">Persönlich</p><h2>Über mich</h2><p>Ich bin Fabian Nutz, Gründer von ThurSky. Besonders wichtig sind mir Zuverlässigkeit, faire Preise, saubere Aufnahmen und schnelle Bearbeitung.</p></article>
+  </section>
+
+  <section class="section" id="leistungen"><div class="section-heading"><p class="eyebrow">Angebot</p><h2>Leistungen</h2></div><div class="grid grid-3">
+    <article class="card"><h3>Haus & Immobilien</h3><p>Luftbilder und Videos von Einfamilienhäusern, Grundstücken und Immobilien.</p></article>
+    <article class="card"><h3>Solar & Dach</h3><p>Übersichtsaufnahmen von Solaranlagen und Dächern zur visuellen Kontrolle.</p></article>
+    <article class="card"><h3>Feldübersicht</h3><p>Optische Überflüge und Unterstützung bei der eigenen Feldkontrolle.</p></article>
+  </div></section>
+
+  <section class="section" id="galerie"><div class="section-heading"><p class="eyebrow">Einblicke</p><h2>Galerie</h2><p>Lege deine vorhandenen Dateien in <code>assets/images/gallery</code> ab und passe die Dateinamen hier an.</p></div><div class="gallery card">
+    <img src="/assets/images/gallery/DJI_0005.JPG" alt="Drohnenaufnahme" loading="lazy">
+    <img src="/assets/images/gallery/DJI_0006.JPG" alt="Drohnenaufnahme" loading="lazy">
+    <img src="/assets/images/gallery/DJI_0008.JPG" alt="Drohnenaufnahme" loading="lazy">
+  </div></section>
+
+  <section class="section" id="preise"><div class="section-heading"><p class="eyebrow">Transparent</p><h2>Preise</h2></div><div class="card"><div class="price-row"><span>5 Luftbilder</span><strong>10 CHF</strong></div><div class="price-row"><span>Video</span><strong>15 CHF</strong></div><div class="price-row"><span>Foto + Video</span><strong>20 CHF</strong></div><div class="price-row"><span>Solarcheck</span><strong>20 CHF</strong></div><div class="price-row"><span>Feldkontrolle pro 60 Minuten</span><strong>25 CHF</strong></div></div></section>
+
+  <section class="section" id="bestellen"><div class="section-heading"><p class="eyebrow">Anfrage</p><h2>Bestellung anfragen</h2><p>Zum Schutz deiner Bestellhistorie meldest du dich zuerst an. Danach wird die Anfrage direkt deinem Kundenkonto zugeordnet.</p></div><form class="card" id="orderForm">
+    <div id="orderLoginNotice" class="notice">Bitte melde dich an, bevor du die Anfrage sendest.</div>
+    <div class="form-grid">
+      <div class="field"><label for="package">Leistung *</label><select id="package" required><option value="">Bitte wählen</option><option>5 Luftbilder</option><option>Video</option><option>Foto + Video</option><option>Solarcheck</option><option>Feldkontrolle</option></select></div>
+      <div class="field"><label for="desiredDate">Wunschdatum</label><input id="desiredDate" type="date"></div>
+      <div class="field"><label for="street">Strasse *</label><input id="street" required minlength="3"></div>
+      <div class="field"><label for="postalCode">PLZ *</label><input id="postalCode" required pattern="[0-9]{4}"></div>
+      <div class="field"><label for="city">Ort *</label><input id="city" required minlength="2"></div>
+      <div class="field field-full"><label for="message">Nachricht</label><textarea id="message" rows="5"></textarea></div>
+    </div>
+    <div class="hero-actions" style="justify-content:flex-start"><button class="btn btn-secondary" type="button" id="loginForOrder">Anmelden</button><button class="btn btn-primary" type="submit">Anfrage senden</button></div><div id="orderResult"></div>
+  </form></section>
+
+  <section class="section" id="kontakt"><div class="section-heading"><p class="eyebrow">Kontakt</p><h2>Kontakt</h2></div><div class="card"><p><strong>E-Mail:</strong> <a href="mailto:dronenshots.kemmental@gmail.com">dronenshots.kemmental@gmail.com</a><br><strong>Telefon:</strong> 071 670 17 76<br><strong>Region:</strong> Thurgau / Kemmental</p></div></section>
+</main>
+<footer class="site-footer">ThurSky © <span id="year"></span> · <a href="/impressum.html" style="color:white">Impressum</a></footer>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script type="module" src="/assets/js/main.js"></script>
+</body>
+</html>

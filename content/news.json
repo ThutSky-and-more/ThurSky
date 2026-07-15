@@ -1,5 +1,12 @@
 {
   "posts": [
-    {"title":"Willkommen bei ThurSky","date":"2026-07-15T12:00:00Z","description":"Unsere neue Website mit Kundenkonto und Galerie ist online.","image":"/assets/images/hero.jpg","body":"Hier informieren wir künftig über neue Projekte, Aufnahmen und Angebote.","published":true}
+    {
+      "published": true,
+      "date": "2026-07-16T01:09:00+02:00",
+      "title": "Test",
+      "image": "/assets/images/uploads/dji_0454.jpg",
+      "description": "Kirche",
+      "body": "Kirche"
+    }
   ]
 }

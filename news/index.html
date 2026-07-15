@@ -1,11 +1,4 @@
-from pathlib import Path
-import zipfile, textwrap, os, json
-
-base = Path("/mnt/data/thursky-news-variante2")
-(base / "news").mkdir(parents=True, exist_ok=True)
-(base / "scripts").mkdir(parents=True, exist_ok=True)
-
-news_html = r'''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">

@@ -1,58 +1,1045 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ThurSky Drohnenaufnahmen – Luftbilder und Videos im Thurgau</title>
-  <meta name="description" content="Drohnenaufnahmen im Thurgau: Luftbilder, Videos, Solar- und Dachaufnahmen sowie Immobilienaufnahmen.">
-  <link rel="stylesheet" href="/assets/css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ThurSky Drohnenaufnahmen – Luftbilder, Videos und mehr im Thurgau</title>
+  <meta name="description" content="Drohnenaufnahmen in Kemmental und im Thurgau: Luftbilder, Videos, Solar- und Dachaufnahmen, Immobilien, Feldübersicht und mehr.">
+  <meta name="keywords" content="Drohnenaufnahmen Thurgau, Drohnenfotografie Schweiz, Luftbilder, Drohnenvideo, Solaraufnahmen, Immobilien, ThurSky, Kemmental">
+  <meta name="author" content="ThurSky – Fabian Nutz">
+  <meta name="robots" content="index,follow">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="de_CH">
+  <meta property="og:title" content="ThurSky – Drohnenaufnahmen im Thurgau">
+  <meta property="og:description" content="Persönliche Foto- und Videoaufnahmen aus der Luft – schnell, sauber und unkompliziert.">
+  <meta property="og:image" content="/assets/images/hero.jpg">
+
+  <link rel="icon" href="/assets/images/logo.png">
+
+  <style>
+    :root {
+      --dark: #256c70;
+      --dark-hover: #1d5659;
+      --accent: #f5a623;
+      --accent-hover: #d98d13;
+      --background: #f3f3f3;
+      --card: #ffffff;
+      --text: #222222;
+      --text-light: #555555;
+      --border: #dddddd;
+      --shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+      --shadow-hover: 0 18px 32px rgba(0, 0, 0, 0.22);
+      --radius: 20px;
+      --header-height: 90px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--background);
+      line-height: 1.6;
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 10000;
+      padding: 10px 14px;
+      color: #ffffff;
+      background: #000000;
+      border-radius: 8px;
+      transform: translateY(-160%);
+      transition: transform 0.2s ease;
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    /* HEADER */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      min-height: var(--header-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 10px 20px;
+      color: #ffffff;
+      background: var(--dark);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .brand img {
+      width: auto;
+      height: 62px;
+      object-fit: contain;
+    }
+
+    .menu-toggle {
+      width: 52px;
+      height: 52px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      color: #ffffff;
+      background: transparent;
+      border: 0;
+      border-radius: 12px;
+      font-size: 34px;
+      line-height: 1;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .menu-toggle:hover,
+    .menu-toggle:focus-visible {
+      background: rgba(255, 255, 255, 0.12);
+      transform: scale(1.05);
+      outline: none;
+    }
+
+    .main-nav {
+      position: fixed;
+      top: var(--header-height);
+      right: 16px;
+      left: 16px;
+      z-index: 1100;
+      display: none;
+      max-height: calc(100vh - var(--header-height) - 20px);
+      overflow-y: auto;
+      flex-direction: column;
+      gap: 4px;
+      padding: 14px;
+      background: var(--dark);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.34);
+      animation: menuFade 0.2s ease;
+    }
+
+    .main-nav.show {
+      display: flex;
+    }
+
+    .main-nav a,
+    .nav-login-button {
+      display: block;
+      width: 100%;
+      padding: 13px 14px;
+      color: #ffffff;
+      background: transparent;
+      border: 0;
+      border-radius: 12px;
+      text-align: left;
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+
+    .main-nav a:hover,
+    .main-nav a:focus-visible,
+    .nav-login-button:hover,
+    .nav-login-button:focus-visible {
+      color: var(--accent);
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+    }
+
+    .main-nav .active-link {
+      color: var(--accent);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .main-nav .account-link {
+      margin-top: 5px;
+      font-weight: 700;
+      background: rgba(245, 166, 35, 0.16);
+    }
+
+    .menu-backdrop {
+      position: fixed;
+      inset: var(--header-height) 0 0;
+      z-index: 1050;
+      display: none;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(2px);
+    }
+
+    .menu-backdrop.show {
+      display: block;
+    }
+
+    @keyframes menuFade {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      min-height: 62vh;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      padding: 70px 20px;
+      color: #ffffff;
+      text-align: center;
+      background:
+        linear-gradient(rgba(0, 0, 0, 0.54), rgba(0, 0, 0, 0.58)),
+        url("/assets/images/hero.jpg") center / cover no-repeat;
+      border-radius: 0 0 30px 30px;
+    }
+
+    .hero-content {
+      width: min(850px, 100%);
+      animation: heroEnter 0.7s ease both;
+    }
+
+    .hero-kicker {
+      margin: 0 0 6px;
+      color: #ffffff;
+      font-size: clamp(15px, 2.5vw, 20px);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: clamp(48px, 11vw, 100px);
+      line-height: 1;
+      text-shadow: 0 5px 20px rgba(0, 0, 0, 0.45);
+    }
+
+    .hero-text {
+      max-width: 760px;
+      margin: 20px auto 0;
+      color: #ffffff;
+      font-size: clamp(18px, 3vw, 25px);
+      line-height: 1.5;
+      text-shadow: 0 3px 15px rgba(0, 0, 0, 0.45);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    @keyframes heroEnter {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* BUTTONS */
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 50px;
+      padding: 13px 22px;
+      border: 0;
+      border-radius: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .button:hover,
+    .button:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 9px 22px rgba(0, 0, 0, 0.25);
+      outline: none;
+    }
+
+    .button-primary {
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--dark), #333333);
+    }
+
+    .button-primary:hover,
+    .button-primary:focus-visible {
+      background: linear-gradient(135deg, #333333, var(--dark));
+    }
+
+    .button-accent {
+      color: #202020;
+      background: var(--accent);
+    }
+
+    .button-accent:hover,
+    .button-accent:focus-visible {
+      background: var(--accent-hover);
+    }
+
+    .button-light {
+      color: var(--dark);
+      background: rgba(255, 255, 255, 0.94);
+    }
+
+    .button-light:hover,
+    .button-light:focus-visible {
+      background: #ffffff;
+    }
+
+    /* MAIN CONTENT */
+    main {
+      display: block;
+    }
+
+    .content-section {
+      width: min(1200px, 100%);
+      margin: 0 auto;
+      padding: 45px 16px;
+    }
+
+    .section-heading {
+      margin: 0 0 24px;
+      text-align: center;
+    }
+
+    .section-heading h2 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 5vw, 42px);
+      color: var(--dark);
+    }
+
+    .section-heading p {
+      max-width: 720px;
+      margin: 0 auto;
+      color: var(--text-light);
+    }
+
+    .box {
+      margin-bottom: 28px;
+      padding: 28px 24px;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .box:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .box h2,
+    .box h3 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      color: var(--dark);
+    }
+
+    .box p {
+      margin-top: 0;
+      color: var(--text-light);
+    }
+
+    .box p:last-child,
+    .box ul:last-child {
+      margin-bottom: 0;
+    }
+
+    .feature-list {
+      margin: 16px 0 0;
+      padding-left: 22px;
+    }
+
+    .feature-list li {
+      margin-bottom: 8px;
+    }
+
+    .box-actions {
+      margin-top: 22px;
+    }
+
+    /* CARDS */
+    .service-grid,
+    .quick-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .service-card,
+    .quick-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 180px;
+      padding: 24px;
+      overflow: hidden;
+      color: var(--text);
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      text-decoration: none;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .service-card::before,
+    .quick-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--dark), var(--accent));
+    }
+
+    .service-card:hover,
+    .service-card:focus-visible,
+    .quick-card:hover,
+    .quick-card:focus-visible {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+      outline: none;
+    }
+
+    .card-icon {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      margin-bottom: 15px;
+      border-radius: 15px;
+      background: rgba(37, 108, 112, 0.12);
+      font-size: 27px;
+    }
+
+    .service-card h3,
+    .quick-card strong {
+      margin: 0 0 8px;
+      color: var(--dark);
+      font-size: 21px;
+    }
+
+    .service-card p,
+    .quick-card span {
+      margin: 0;
+      color: var(--text-light);
+    }
+
+    .card-link-label {
+      margin-top: auto;
+      padding-top: 16px;
+      color: var(--dark);
+      font-weight: 700;
+    }
+
+    /* ABOUT PREVIEW */
+    .about-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .about-image {
+      min-height: 310px;
+      overflow: hidden;
+      background:
+        linear-gradient(rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.12)),
+        url("/assets/images/drohne.jpg") center / cover no-repeat;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .about-text {
+      padding: 28px;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .about-text h2 {
+      margin-top: 0;
+      color: var(--dark);
+    }
+
+    .about-text p {
+      color: var(--text-light);
+    }
+
+    /* CTA */
+    .cta {
+      width: min(1168px, calc(100% - 32px));
+      margin: 0 auto 48px;
+      padding: 36px 24px;
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--dark), #163f42);
+      border-radius: 24px;
+      box-shadow: var(--shadow-hover);
+      text-align: center;
+    }
+
+    .cta h2 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 5vw, 40px);
+    }
+
+    .cta p {
+      max-width: 700px;
+      margin: 0 auto 22px;
+      color: rgba(255, 255, 255, 0.86);
+    }
+
+    /* FOOTER */
+    .site-footer {
+      padding: 28px 18px;
+      color: #ffffff;
+      background: var(--dark);
+      border-radius: 30px 30px 0 0;
+      text-align: center;
+    }
+
+    .footer-inner {
+      width: min(1200px, 100%);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .footer-links a {
+      color: #ffffff;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .footer-links a:hover,
+    .footer-links a:focus-visible {
+      color: var(--accent);
+      outline: none;
+    }
+
+    .footer-note {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+    }
+
+    /* STATUS */
+    .status-toast {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 2000;
+      display: none;
+      max-width: min(390px, calc(100% - 32px));
+      padding: 14px 18px;
+      color: #ffffff;
+      background: #222222;
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
+    }
+
+    .status-toast.show {
+      display: block;
+      animation: toastEnter 0.25s ease;
+    }
+
+    @keyframes toastEnter {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* DESKTOP */
+    @media (min-width: 700px) {
+      .content-section {
+        padding: 55px 24px;
+      }
+
+      .service-grid,
+      .quick-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .about-layout {
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      }
+    }
+
+    @media (min-width: 1050px) {
+      :root {
+        --header-height: 94px;
+      }
+
+      .site-header {
+        padding: 10px 32px;
+      }
+
+      .brand img {
+        height: 70px;
+      }
+
+      .menu-toggle,
+      .menu-backdrop {
+        display: none !important;
+      }
+
+      .main-nav {
+        position: static;
+        display: flex;
+        max-height: none;
+        overflow: visible;
+        flex-direction: row;
+        align-items: center;
+        gap: 2px;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        animation: none;
+      }
+
+      .main-nav a,
+      .nav-login-button {
+        width: auto;
+        padding: 10px 11px;
+        text-align: center;
+        white-space: nowrap;
+      }
+
+      .main-nav .account-link {
+        margin-top: 0;
+        margin-left: 5px;
+      }
+
+      .service-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .quick-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "ThurSky",
+    "description": "Drohnenaufnahmen, Luftbilder und Videos im Thurgau.",
+    "areaServed": "Thurgau, Schweiz",
+    "email": "dronenshots.kemmental@gmail.com",
+    "telephone": "+41716701776",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Haldenstrasse 10",
+      "postalCode": "8566",
+      "addressLocality": "Lippoldswilen",
+      "addressCountry": "CH"
+    }
+  }
+  </script>
 </head>
+
 <body>
-<header class="site-header">
-  <a class="brand" href="/"><img src="/assets/images/logo.png" alt="ThurSky Logo"><span>ThurSky</span></a>
-  <button class="menu-toggle" id="menuToggle" aria-label="Menü öffnen">☰</button>
-  <nav class="desktop-nav" id="mainNav">
-    <a href="#start">Start</a><a href="#leistungen">Leistungen</a><a href="#galerie">Galerie</a><a href="#preise">Preise</a><a href="/news/">News</a><a href="#bestellen">Bestellen</a><a href="#kontakt">Kontakt</a><a href="/konto/">Kundenkonto</a>
-  </nav>
-</header>
-<section class="hero" id="start"><div class="hero-inner"><p class="eyebrow">Drohnenaufnahmen im Thurgau</p><h1>ThurSky</h1><p>Saubere und zuverlässige Luftbilder und Videos – schnell, persönlich und unkompliziert.</p><div class="hero-actions"><a class="btn btn-primary" href="#bestellen">Anfrage starten</a><a class="btn btn-secondary" href="/konto/">Kundenkonto</a></div></div></section>
-<main class="page-shell">
-  <section class="section grid grid-2">
-    <article class="card"><p class="eyebrow">Über ThurSky</p><h2>Ihre Drohnenaufnahme aus dem Thurgau</h2><p>Mit moderner Drohnentechnik erstellen wir Foto- und Videoaufnahmen für Privatpersonen, Landwirtschaft und kleinere Projekte.</p></article>
-    <article class="card"><p class="eyebrow">Persönlich</p><h2>Über mich</h2><p>Ich bin Fabian Nutz, Gründer von ThurSky. Besonders wichtig sind mir Zuverlässigkeit, faire Preise, saubere Aufnahmen und schnelle Bearbeitung.</p></article>
+  <a class="skip-link" href="#main-content">Direkt zum Inhalt</a>
+
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="ThurSky Startseite">
+      <img src="/assets/images/logo.png" alt="ThurSky Logo">
+    </a>
+
+    <button
+      class="menu-toggle"
+      id="menuToggle"
+      type="button"
+      aria-label="Menü öffnen"
+      aria-controls="mainNav"
+      aria-expanded="false"
+    >☰</button>
+
+    <nav class="main-nav" id="mainNav" aria-label="Hauptnavigation">
+      <a class="active-link" href="/" aria-current="page">Start</a>
+      <a href="/ueber-mich/">Ich &amp; Equipment</a>
+      <a href="/leistungen/">Leistungen</a>
+      <a href="/galerie/">Galerie</a>
+      <a href="/preise/">Preise</a>
+      <a href="/news/">News</a>
+      <a href="/bestellen/">Bestellen</a>
+      <a href="/kontakt/">Kontakt</a>
+      <a class="account-link" id="accountLink" href="/konto/">Kundenkonto</a>
+      <button class="nav-login-button" id="loginButton" type="button">Anmelden</button>
+    </nav>
+  </header>
+
+  <div class="menu-backdrop" id="menuBackdrop" aria-hidden="true"></div>
+
+  <section class="hero" aria-labelledby="heroTitle">
+    <div class="hero-content">
+      <p class="hero-kicker">Drohnenaufnahmen im Thurgau</p>
+      <h1 id="heroTitle">ThurSky</h1>
+      <p class="hero-text">
+        Saubere und zuverlässige Foto- und Videoaufnahmen – schnell, persönlich und unkompliziert.
+      </p>
+      <div class="hero-actions">
+        <a class="button button-accent" href="/bestellen/">Unverbindlich anfragen</a>
+        <a class="button button-light" href="/galerie/">Galerie ansehen</a>
+      </div>
+    </div>
   </section>
 
-  <section class="section" id="leistungen"><div class="section-heading"><p class="eyebrow">Angebot</p><h2>Leistungen</h2></div><div class="grid grid-3">
-    <article class="card"><h3>Haus & Immobilien</h3><p>Luftbilder und Videos von Einfamilienhäusern, Grundstücken und Immobilien.</p></article>
-    <article class="card"><h3>Solar & Dach</h3><p>Übersichtsaufnahmen von Solaranlagen und Dächern zur visuellen Kontrolle.</p></article>
-    <article class="card"><h3>Feldübersicht</h3><p>Optische Überflüge und Unterstützung bei der eigenen Feldkontrolle.</p></article>
-  </div></section>
+  <main id="main-content">
+    <section class="content-section" aria-labelledby="introTitle">
+      <article class="box">
+        <h2 id="introTitle">Ihre Drohnenaufnahme aus dem Thurgau</h2>
+        <p>
+          Mit modernen Drohnen erstellen wir saubere und zuverlässige Foto- und Videoaufnahmen –
+          schnell und unkompliziert. ThurSky richtet sich an Privatpersonen, Landwirte und kleinere
+          Projekte im Thurgau und in der Umgebung.
+        </p>
+      </article>
 
-  <section class="section" id="galerie"><div class="section-heading"><p class="eyebrow">Einblicke</p><h2>Galerie</h2><p>Lege deine vorhandenen Dateien in <code>assets/images/gallery</code> ab und passe die Dateinamen hier an.</p></div><div class="gallery card">
-    <img src="/assets/images/gallery/DJI_0005.JPG" alt="Drohnenaufnahme" loading="lazy">
-    <img src="/assets/images/gallery/DJI_0006.JPG" alt="Drohnenaufnahme" loading="lazy">
-    <img src="/assets/images/gallery/DJI_0008.JPG" alt="Drohnenaufnahme" loading="lazy">
-  </div></section>
+      <article class="box">
+        <h2>Warum „Drohne“ ohne h?</h2>
+        <p>
+          Der ursprüngliche Name Dronenshots Kemmental leitete sich bewusst vom englischen Wort
+          „drone“ ab. So verbinden wir internationale Bildsprache mit moderner Technik und heben uns
+          gleichzeitig klar von anderen Anbietern ab. Der heutige Name ThurSky steht für Innovation,
+          Kreativität und einen frischen Auftritt.
+        </p>
+      </article>
 
-  <section class="section" id="preise"><div class="section-heading"><p class="eyebrow">Transparent</p><h2>Preise</h2></div><div class="card"><div class="price-row"><span>5 Luftbilder</span><strong>10 CHF</strong></div><div class="price-row"><span>Video</span><strong>15 CHF</strong></div><div class="price-row"><span>Foto + Video</span><strong>20 CHF</strong></div><div class="price-row"><span>Solarcheck</span><strong>20 CHF</strong></div><div class="price-row"><span>Feldkontrolle pro 60 Minuten</span><strong>25 CHF</strong></div></div></section>
+      <article class="box">
+        <h2>Unser Einsatzbereich</h2>
+        <ul class="feature-list">
+          <li>Fotos und Videos Ihres Einfamilienhauses</li>
+          <li>Luftaufnahmen von Solaranlagen zur Kontrolle</li>
+          <li>Solar- und Dachinspektionen</li>
+          <li>Schulprojekte und Dokumentationen</li>
+          <li>Optische Überflüge vor dem Mähen</li>
+          <li>Schnelle Übersicht über landwirtschaftliche Flächen</li>
+          <li>Unterstützung bei der eigenen Feldkontrolle</li>
+        </ul>
+        <div class="box-actions">
+          <a class="button button-primary" href="/leistungen/">Alle Leistungen ansehen</a>
+        </div>
+      </article>
+    </section>
 
-  <section class="section" id="bestellen"><div class="section-heading"><p class="eyebrow">Anfrage</p><h2>Bestellung anfragen</h2><p>Zum Schutz deiner Bestellhistorie meldest du dich zuerst an. Danach wird die Anfrage direkt deinem Kundenkonto zugeordnet.</p></div><form class="card" id="orderForm">
-    <div id="orderLoginNotice" class="notice">Bitte melde dich an, bevor du die Anfrage sendest.</div>
-    <div class="form-grid">
-      <div class="field"><label for="package">Leistung *</label><select id="package" required><option value="">Bitte wählen</option><option>5 Luftbilder</option><option>Video</option><option>Foto + Video</option><option>Solarcheck</option><option>Feldkontrolle</option></select></div>
-      <div class="field"><label for="desiredDate">Wunschdatum</label><input id="desiredDate" type="date"></div>
-      <div class="field"><label for="street">Strasse *</label><input id="street" required minlength="3"></div>
-      <div class="field"><label for="postalCode">PLZ *</label><input id="postalCode" required pattern="[0-9]{4}"></div>
-      <div class="field"><label for="city">Ort *</label><input id="city" required minlength="2"></div>
-      <div class="field field-full"><label for="message">Nachricht</label><textarea id="message" rows="5"></textarea></div>
+    <section class="content-section" aria-labelledby="servicesTitle">
+      <div class="section-heading">
+        <h2 id="servicesTitle">Leistungen im Überblick</h2>
+        <p>Wählen Sie das passende Angebot und senden Sie anschliessend eine unverbindliche Anfrage.</p>
+      </div>
+
+      <div class="service-grid">
+        <a class="service-card" href="/leistungen/">
+          <span class="card-icon" aria-hidden="true">🏠</span>
+          <h3>Haus &amp; Immobilien</h3>
+          <p>Luftbilder und Videos von Häusern, Grundstücken und kleineren Immobilienprojekten.</p>
+          <span class="card-link-label">Mehr erfahren →</span>
+        </a>
+
+        <a class="service-card" href="/leistungen/">
+          <span class="card-icon" aria-hidden="true">☀️</span>
+          <h3>Solar &amp; Dach</h3>
+          <p>Übersichtsaufnahmen von Solaranlagen und Dächern zur visuellen Kontrolle.</p>
+          <span class="card-link-label">Mehr erfahren →</span>
+        </a>
+
+        <a class="service-card" href="/leistungen/">
+          <span class="card-icon" aria-hidden="true">🌾</span>
+          <h3>Feldübersicht</h3>
+          <p>Unterstützung bei der Übersicht und bei der eigenen Kontrolle landwirtschaftlicher Flächen.</p>
+          <span class="card-link-label">Mehr erfahren →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="content-section" aria-labelledby="aboutTitle">
+      <div class="about-layout">
+        <div class="about-image" role="img" aria-label="DJI Drohne von ThurSky"></div>
+
+        <article class="about-text">
+          <h2 id="aboutTitle">Persönlich, zuverlässig und technisch interessiert</h2>
+          <p>
+            Mein Name ist Fabian Nutz. ThurSky wurde 2025 gegründet. Zu meinen Hobbys gehören
+            Drohnenfliegen, Fotografie, Technik, Golf, Tauchen und Fahrradfahren.
+          </p>
+          <p>
+            Ich besitze den Drohnenführerschein A1/A3 für die Schweiz und möchte professionelle,
+            unkomplizierte Luftaufnahmen für Privatpersonen, Landwirte und kleinere Projekte anbieten.
+          </p>
+          <ul class="feature-list">
+            <li>Zuverlässigkeit</li>
+            <li>Saubere Aufnahmen</li>
+            <li>Faire Preise</li>
+            <li>Schnelle Bearbeitung</li>
+          </ul>
+          <div class="box-actions">
+            <a class="button button-primary" href="/ueber-mich/">Mehr über mich und mein Equipment</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="content-section" aria-labelledby="quickTitle">
+      <div class="section-heading">
+        <h2 id="quickTitle">Direkt zum gewünschten Bereich</h2>
+      </div>
+
+      <div class="quick-grid">
+        <a class="quick-card" href="/preise/">
+          <strong>Faire Preise</strong>
+          <span>Pakete bereits ab 10 CHF ansehen.</span>
+          <span class="card-link-label">Zur Preisliste →</span>
+        </a>
+
+        <a class="quick-card" href="/news/">
+          <strong>News</strong>
+          <span>Aktuelle Beiträge, Projekte und Neuigkeiten von ThurSky.</span>
+          <span class="card-link-label">News öffnen →</span>
+        </a>
+
+        <a class="quick-card" href="/konto/">
+          <strong>Kundenkonto</strong>
+          <span>Bestellstatus, bisherige Aufträge und freigegebene Downloads ansehen.</span>
+          <span class="card-link-label">Zum Kundenkonto →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="cta" aria-labelledby="ctaTitle">
+      <h2 id="ctaTitle">Interesse an einer Drohnenaufnahme?</h2>
+      <p>
+        Senden Sie eine unverbindliche Anfrage. Gemeinsam klären wir Aufnahmeort, gewünschte Leistung
+        und einen passenden Termin.
+      </p>
+      <a class="button button-accent" href="/bestellen/">Jetzt Anfrage senden</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="/impressum.html">Impressum</a>
+        <a href="/kontakt/">Kontakt</a>
+        <a href="/konto/">Kundenkonto</a>
+        <a href="https://instagram.com/ThurSky.ch" target="_blank" rel="noopener noreferrer">Instagram</a>
+      </div>
+      <p class="footer-note">ThurSky © <span id="currentYear"></span> · Thurgau / Kemmental</p>
     </div>
-    <div class="hero-actions" style="justify-content:flex-start"><button class="btn btn-secondary" type="button" id="loginForOrder">Anmelden</button><button class="btn btn-primary" type="submit">Anfrage senden</button></div><div id="orderResult"></div>
-  </form></section>
+  </footer>
 
-  <section class="section" id="kontakt"><div class="section-heading"><p class="eyebrow">Kontakt</p><h2>Kontakt</h2></div><div class="card"><p><strong>E-Mail:</strong> <a href="mailto:dronenshots.kemmental@gmail.com">dronenshots.kemmental@gmail.com</a><br><strong>Telefon:</strong> 071 670 17 76<br><strong>Region:</strong> Thurgau / Kemmental</p></div></section>
-</main>
-<footer class="site-footer">ThurSky © <span id="year"></span> · <a href="/impressum.html" style="color:white">Impressum</a></footer>
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-<script type="module" src="/assets/js/main.js"></script>
+  <div class="status-toast" id="statusToast" role="status" aria-live="polite"></div>
+
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script>
+    (() => {
+      "use strict";
+
+      const menuToggle = document.getElementById("menuToggle");
+      const mainNav = document.getElementById("mainNav");
+      const menuBackdrop = document.getElementById("menuBackdrop");
+      const loginButton = document.getElementById("loginButton");
+      const accountLink = document.getElementById("accountLink");
+      const statusToast = document.getElementById("statusToast");
+      const currentYear = document.getElementById("currentYear");
+
+      currentYear.textContent = String(new Date().getFullYear());
+
+      function setMenu(open) {
+        mainNav.classList.toggle("show", open);
+        menuBackdrop.classList.toggle("show", open);
+        document.body.classList.toggle("menu-open", open);
+        menuToggle.setAttribute("aria-expanded", String(open));
+        menuToggle.setAttribute("aria-label", open ? "Menü schliessen" : "Menü öffnen");
+        menuToggle.textContent = open ? "×" : "☰";
+      }
+
+      menuToggle.addEventListener("click", () => {
+        setMenu(!mainNav.classList.contains("show"));
+      });
+
+      menuBackdrop.addEventListener("click", () => setMenu(false));
+
+      mainNav.addEventListener("click", (event) => {
+        if (event.target.closest("a")) {
+          setMenu(false);
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          setMenu(false);
+        }
+      });
+
+      window.addEventListener("resize", () => {
+        if (window.innerWidth >= 1050) {
+          setMenu(false);
+        }
+      });
+
+      function showToast(message) {
+        if (!message) return;
+        statusToast.textContent = message;
+        statusToast.classList.add("show");
+        window.clearTimeout(showToast.timeoutId);
+        showToast.timeoutId = window.setTimeout(() => {
+          statusToast.classList.remove("show");
+        }, 3500);
+      }
+
+      function getRoles(user) {
+        const roles = user && user.app_metadata && Array.isArray(user.app_metadata.roles)
+          ? user.app_metadata.roles
+          : [];
+        return roles;
+      }
+
+      function updateIdentityNavigation(user) {
+        if (!loginButton || !accountLink) return;
+
+        if (!user) {
+          loginButton.textContent = "Anmelden";
+          loginButton.dataset.action = "login";
+          accountLink.textContent = "Kundenkonto";
+          accountLink.href = "/konto/";
+          return;
+        }
+
+        const roles = getRoles(user);
+        const isAdmin = roles.includes("admin");
+
+        loginButton.textContent = "Abmelden";
+        loginButton.dataset.action = "logout";
+        accountLink.textContent = isAdmin ? "Adminbereich" : "Mein Konto";
+        accountLink.href = isAdmin ? "/backend/" : "/konto/";
+      }
+
+      function initializeIdentity() {
+        if (!window.netlifyIdentity) {
+          loginButton.hidden = true;
+          return;
+        }
+
+        const identity = window.netlifyIdentity;
+        identity.init();
+        updateIdentityNavigation(identity.currentUser());
+
+        loginButton.addEventListener("click", () => {
+          if (identity.currentUser()) {
+            identity.logout();
+          } else {
+            identity.open("login");
+          }
+        });
+
+        identity.on("login", (user) => {
+          updateIdentityNavigation(user);
+          identity.close();
+          showToast("Anmeldung erfolgreich.");
+
+          const roles = getRoles(user);
+          window.location.href = roles.includes("admin") ? "/backend/" : "/konto/";
+        });
+
+        identity.on("logout", () => {
+          updateIdentityNavigation(null);
+          showToast("Sie wurden abgemeldet.");
+        });
+
+        identity.on("error", (error) => {
+          console.error("Netlify Identity Fehler:", error);
+          showToast("Bei der Anmeldung ist ein Fehler aufgetreten.");
+        });
+      }
+
+      initializeIdentity();
+    })();
+  </script>
 </body>
 </html>

@@ -1,102 +1,22 @@
 from pathlib import Path
+import zipfile, textwrap, os, json
 
-script = r'''import fs from "node:fs/promises";
-import path from "node:path";
-import matter from "gray-matter";
-import { marked } from "marked";
-import sanitizeHtml from "sanitize-html";
+base = Path("/mnt/data/thursky-news-variante2")
+(base / "news").mkdir(parents=True, exist_ok=True)
+(base / "scripts").mkdir(parents=True, exist_ok=True)
 
-const root = process.cwd();
-const sourceDir = path.join(root, "content", "news");
-const outputDir = path.join(root, "news");
-const dataDir = path.join(root, "assets", "data");
-
-await fs.mkdir(sourceDir, { recursive: true });
-await fs.mkdir(outputDir, { recursive: true });
-await fs.mkdir(dataDir, { recursive: true });
-
-const files = (await fs.readdir(sourceDir))
-  .filter((name) => name.toLowerCase().endsWith(".md"));
-
-const posts = [];
-
-for (const filename of files) {
-  const raw = await fs.readFile(path.join(sourceDir, filename), "utf8");
-  const { data, content } = matter(raw);
-
-  if (data.published === false) continue;
-
-  const slug = filename.replace(/\.md$/i, "");
-
-  const html = sanitizeHtml(marked.parse(content), {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat([
-      "img",
-      "h1",
-      "h2",
-      "h3",
-      "figure",
-      "figcaption",
-    ]),
-    allowedAttributes: {
-      a: ["href", "target", "rel"],
-      img: ["src", "alt", "title", "loading"],
-    },
-  });
-
-  const post = {
-    slug,
-    title: String(data.title || slug),
-    date: new Date(data.date || Date.now()).toISOString(),
-    description: String(data.description || ""),
-    image: String(data.image || ""),
-    html,
-  };
-
-  posts.push(post);
-
-  const postDir = path.join(outputDir, slug);
-  await fs.mkdir(postDir, { recursive: true });
-  await fs.writeFile(
-    path.join(postDir, "index.html"),
-    renderPost(post),
-    "utf8"
-  );
-}
-
-posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-await fs.writeFile(
-  path.join(dataDir, "news.json"),
-  JSON.stringify(posts, null, 2),
-  "utf8"
-);
-
-await fs.writeFile(
-  path.join(outputDir, "index.html"),
-  renderIndex(posts),
-  "utf8"
-);
-
-function layout({
-  title,
-  description,
-  heroTitle,
-  heroText,
-  body,
-  canonicalPath,
-}) {
-  const year = new Date().getFullYear();
-
-  return `<!DOCTYPE html>
+news_html = r'''<!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>${escapeHtml(title)} | ThurSky</title>
-  <meta name="description" content="${escapeHtml(description)}">
+  <title>News | ThurSky</title>
+  <meta
+    name="description"
+    content="Aktuelle News, Projekte und Einblicke von ThurSky – Drohnenaufnahmen im Thurgau."
+  >
   <meta name="robots" content="index,follow">
-  <link rel="canonical" href="${escapeHtml(canonicalPath)}">
 
   <style>
     :root {
@@ -136,8 +56,12 @@ function layout({
     }
 
     img {
-      max-width: 100%;
       display: block;
+      max-width: 100%;
+    }
+
+    .hidden {
+      display: none !important;
     }
 
     .site-header {
@@ -429,80 +353,20 @@ function layout({
       box-shadow: 0 11px 24px rgba(37,108,112,.3);
     }
 
-    .empty-state {
-      padding: 38px 26px;
+    .status-box {
+      padding: 34px 24px;
       text-align: center;
     }
 
-    .empty-state h2 {
-      margin-top: 0;
+    .status-box h2 {
+      margin: 0 0 10px;
       color: var(--dark-2);
     }
 
-    .article {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: clamp(24px, 5vw, 46px);
-    }
-
-    .article:hover {
-      transform: none;
-    }
-
-    .article h1 {
-      margin: 6px 0 14px;
-      color: var(--dark-2);
-      font-size: clamp(2rem, 5vw, 3.25rem);
-      line-height: 1.1;
-    }
-
-    .article-lead {
-      margin: 0 0 28px;
+    .status-box p {
+      margin: 0;
       color: var(--muted);
-      font-size: 1.15rem;
-      line-height: 1.75;
-    }
-
-    .article-hero {
-      width: 100%;
-      max-height: 560px;
-      margin: 24px 0 32px;
-      border-radius: 18px;
-      object-fit: cover;
-      box-shadow: 0 12px 28px rgba(0,0,0,.16);
-    }
-
-    .article-body {
-      color: #34393b;
-      font-size: 1.05rem;
-      line-height: 1.82;
-    }
-
-    .article-body h2,
-    .article-body h3 {
-      margin-top: 1.8em;
-      color: var(--dark-2);
-      line-height: 1.25;
-    }
-
-    .article-body img {
-      height: auto;
-      margin: 28px auto;
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-    }
-
-    .article-body a {
-      color: var(--dark);
-      font-weight: 700;
-    }
-
-    .article-body blockquote {
-      margin: 24px 0;
-      padding: 17px 20px;
-      border-left: 5px solid var(--accent);
-      border-radius: 0 12px 12px 0;
-      background: rgba(245,166,35,.09);
+      line-height: 1.7;
     }
 
     .site-footer {
@@ -583,8 +447,6 @@ function layout({
       }
     }
   </style>
-
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
   <header class="site-header">
@@ -623,185 +485,357 @@ function layout({
   <section class="hero">
     <div class="hero-inner">
       <p class="eyebrow">Aktuelles von ThurSky</p>
-      <h1>${escapeHtml(heroTitle)}</h1>
-      <p>${escapeHtml(heroText)}</p>
+      <h1>News</h1>
+      <p>
+        Neue Projekte, besondere Aufnahmen und aktuelle Informationen
+        rund um ThurSky.
+      </p>
     </div>
   </section>
 
   <main>
-    ${body}
+    <section>
+      <div class="section-heading">
+        <p class="eyebrow">Neuigkeiten und Projekte</p>
+        <h2>Aktuelle Beiträge</h2>
+        <p>
+          Hier findest du Neuigkeiten, Einblicke hinter die Kulissen
+          und Informationen zu aktuellen Drohnenprojekten.
+        </p>
+      </div>
+
+      <div id="loadingBox" class="box status-box">
+        <h2>News werden geladen</h2>
+        <p>Bitte einen Moment warten.</p>
+      </div>
+
+      <div id="errorBox" class="box status-box hidden">
+        <h2>News konnten nicht geladen werden</h2>
+        <p id="errorText">
+          Bitte versuche es später erneut.
+        </p>
+      </div>
+
+      <div id="emptyBox" class="box status-box hidden">
+        <h2>Noch keine News vorhanden</h2>
+        <p>
+          Sobald du im CMS einen Beitrag veröffentlichst, erscheint er
+          automatisch auf dieser Seite.
+        </p>
+      </div>
+
+      <div id="newsGrid" class="news-grid hidden"></div>
+
+      <div class="button-row">
+        <a class="back-link" href="/">← Zurück zur Startseite</a>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
-    <p>ThurSky © ${year}</p>
+    <p>ThurSky © <span id="year"></span></p>
     <a href="/impressum.html">Impressum</a>
   </footer>
 
   <script>
     (() => {
-      const button = document.getElementById("menuToggle");
+      const menuButton = document.getElementById("menuToggle");
       const nav = document.getElementById("mainNav");
       const backdrop = document.getElementById("menuBackdrop");
 
-      function setOpen(open) {
+      function setMenuOpen(open) {
         nav.classList.toggle("open", open);
         backdrop.classList.toggle("open", open);
         document.body.classList.toggle("menu-open", open);
-        button.setAttribute("aria-expanded", String(open));
-        button.setAttribute(
+        menuButton.setAttribute("aria-expanded", String(open));
+        menuButton.setAttribute(
           "aria-label",
           open ? "Menü schliessen" : "Menü öffnen"
         );
-        button.textContent = open ? "×" : "☰";
+        menuButton.textContent = open ? "×" : "☰";
       }
 
-      button.addEventListener("click", () => {
-        setOpen(!nav.classList.contains("open"));
+      menuButton.addEventListener("click", () => {
+        setMenuOpen(!nav.classList.contains("open"));
       });
 
-      backdrop.addEventListener("click", () => setOpen(false));
+      backdrop.addEventListener("click", () => setMenuOpen(false));
 
       nav.querySelectorAll("a").forEach((link) => {
-        link.addEventListener("click", () => setOpen(false));
+        link.addEventListener("click", () => setMenuOpen(false));
       });
 
       document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") setOpen(false);
-      });
-
-      window.addEventListener("resize", () => {
-        if (window.innerWidth > 1200 && nav.classList.contains("open")) {
-          setOpen(false);
+        if (event.key === "Escape") {
+          setMenuOpen(false);
         }
       });
+
+      document.getElementById("year").textContent =
+        new Date().getFullYear();
+    })();
+
+    (() => {
+      const loadingBox = document.getElementById("loadingBox");
+      const errorBox = document.getElementById("errorBox");
+      const errorText = document.getElementById("errorText");
+      const emptyBox = document.getElementById("emptyBox");
+      const newsGrid = document.getElementById("newsGrid");
+
+      function escapeHtml(value) {
+        return String(value ?? "").replace(
+          /[&<>'"]/g,
+          (character) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              "'": "&#39;",
+              '"': "&quot;"
+            })[character]
+        );
+      }
+
+      function formatDate(value) {
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+          return "";
+        }
+
+        return new Intl.DateTimeFormat("de-CH", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric"
+        }).format(date);
+      }
+
+      function safeSlug(value) {
+        return encodeURIComponent(String(value ?? "").trim());
+      }
+
+      function createCard(post) {
+        const article = document.createElement("article");
+        article.className = "box";
+
+        const title = escapeHtml(post.title || "News-Beitrag");
+        const description = escapeHtml(post.description || "");
+        const slug = safeSlug(post.slug);
+        const date = formatDate(post.date);
+
+        const imagePart = post.image
+          ? `
+            <div class="news-image-wrap">
+              <img
+                class="news-image"
+                src="${escapeHtml(post.image)}"
+                alt="${title}"
+                loading="lazy"
+              >
+            </div>
+          `
+          : `
+            <div class="news-image-wrap">
+              <div class="news-placeholder" aria-hidden="true">✦</div>
+            </div>
+          `;
+
+        article.innerHTML = `
+          ${imagePart}
+          <div class="news-content">
+            <p class="news-date">${escapeHtml(date)}</p>
+            <h2>
+              <a href="/news/${slug}/">${title}</a>
+            </h2>
+            <p>${description}</p>
+            <a class="button" href="/news/${slug}/">
+              Beitrag lesen
+            </a>
+          </div>
+        `;
+
+        return article;
+      }
+
+      async function loadNews() {
+        try {
+          const response = await fetch(
+            "/assets/data/news.json",
+            {
+              cache: "no-store"
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(
+              `HTTP ${response.status}: news.json konnte nicht geladen werden.`
+            );
+          }
+
+          const posts = await response.json();
+
+          if (!Array.isArray(posts)) {
+            throw new Error(
+              "Die Datei news.json enthält kein gültiges Beitrags-Array."
+            );
+          }
+
+          loadingBox.classList.add("hidden");
+
+          if (posts.length === 0) {
+            emptyBox.classList.remove("hidden");
+            return;
+          }
+
+          posts
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .forEach((post) => {
+              newsGrid.appendChild(createCard(post));
+            });
+
+          newsGrid.classList.remove("hidden");
+        } catch (error) {
+          console.error("Fehler beim Laden der News:", error);
+          loadingBox.classList.add("hidden");
+          errorText.textContent =
+            error.message || "Unbekannter Fehler beim Laden der News.";
+          errorBox.classList.remove("hidden");
+        }
+      }
+
+      loadNews();
     })();
   </script>
+</body>
+</html>
+'''
+
+build_script = r'''import fs from "node:fs/promises";
+import path from "node:path";
+import matter from "gray-matter";
+import { marked } from "marked";
+import sanitizeHtml from "sanitize-html";
+
+const root = process.cwd();
+const sourceDir = path.join(root, "content", "news");
+const outputDir = path.join(root, "news");
+const dataDir = path.join(root, "assets", "data");
+
+await fs.mkdir(sourceDir, { recursive: true });
+await fs.mkdir(outputDir, { recursive: true });
+await fs.mkdir(dataDir, { recursive: true });
+
+const files = (await fs.readdir(sourceDir))
+  .filter((name) => name.toLowerCase().endsWith(".md"));
+
+const posts = [];
+
+for (const filename of files) {
+  const raw = await fs.readFile(path.join(sourceDir, filename), "utf8");
+  const { data, content } = matter(raw);
+
+  if (data.published === false) continue;
+
+  const slug = filename.replace(/\.md$/i, "");
+
+  const html = sanitizeHtml(marked.parse(content), {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+      "img",
+      "h1",
+      "h2",
+      "h3",
+      "figure",
+      "figcaption",
+    ]),
+    allowedAttributes: {
+      a: ["href", "target", "rel"],
+      img: ["src", "alt", "title", "loading"],
+    },
+  });
+
+  const post = {
+    slug,
+    title: String(data.title || slug),
+    date: new Date(data.date || Date.now()).toISOString(),
+    description: String(data.description || ""),
+    image: String(data.image || ""),
+    html,
+  };
+
+  posts.push(post);
+
+  const postDir = path.join(outputDir, slug);
+  await fs.mkdir(postDir, { recursive: true });
+  await fs.writeFile(
+    path.join(postDir, "index.html"),
+    renderPost(post),
+    "utf8"
+  );
+}
+
+posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+await fs.writeFile(
+  path.join(dataDir, "news.json"),
+  JSON.stringify(posts, null, 2),
+  "utf8"
+);
+
+/*
+ * WICHTIG:
+ * news/index.html wird NICHT erzeugt oder überschrieben.
+ * Diese Datei ist jetzt eine feste HTML-Seite und lädt news.json im Browser.
+ */
+
+function renderPost(post) {
+  const image = post.image
+    ? `<img class="article-hero" src="${escapeHtml(post.image)}" alt="${escapeHtml(post.title)}">`
+    : "";
+
+  return `<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(post.title)} | ThurSky</title>
+  <meta name="description" content="${escapeHtml(post.description)}">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/">
+      <img src="/assets/images/logo.png" alt="ThurSky Logo">
+      <span>ThurSky</span>
+    </a>
+    <nav class="desktop-nav">
+      <a href="/">Start</a>
+      <a href="/news/">News</a>
+      <a href="/konto/">Kundenkonto</a>
+    </nav>
+  </header>
+
+  <main class="page-shell">
+    <article class="article card">
+      <p class="eyebrow">${formatDate(post.date)}</p>
+      <h1>${escapeHtml(post.title)}</h1>
+      <p class="lead">${escapeHtml(post.description)}</p>
+      ${image}
+      <div class="article-body">
+        ${post.html}
+      </div>
+      <p>
+        <a class="text-link" href="/news/">Zurück zu News</a>
+      </p>
+    </article>
+  </main>
 </body>
 </html>`;
 }
 
-function renderIndex(posts) {
-  const cards = posts.length
-    ? posts
-        .map((post) => {
-          const image = post.image
-            ? `<div class="news-image-wrap">
-                <img
-                  class="news-image"
-                  src="${escapeHtml(post.image)}"
-                  alt="${escapeHtml(post.title)}"
-                  loading="lazy"
-                >
-              </div>`
-            : `<div class="news-image-wrap">
-                <div class="news-placeholder" aria-hidden="true">✦</div>
-              </div>`;
-
-          return `<article class="box">
-            ${image}
-            <div class="news-content">
-              <p class="news-date">${formatDate(post.date)}</p>
-              <h2>
-                <a href="/news/${encodeURIComponent(post.slug)}/">
-                  ${escapeHtml(post.title)}
-                </a>
-              </h2>
-              <p>${escapeHtml(post.description)}</p>
-              <a class="button" href="/news/${encodeURIComponent(post.slug)}/">
-                Beitrag lesen
-              </a>
-            </div>
-          </article>`;
-        })
-        .join("")
-    : `<section class="box empty-state">
-        <h2>Noch keine News vorhanden</h2>
-        <p>
-          Sobald ein Beitrag im CMS veröffentlicht wurde, erscheint er
-          automatisch auf dieser Seite.
-        </p>
-      </section>`;
-
-  return layout({
-    title: "News",
-    description:
-      "Aktuelle Neuigkeiten, Projekte und Einblicke von ThurSky im Thurgau.",
-    heroTitle: "News",
-    heroText:
-      "Neue Projekte, besondere Aufnahmen und aktuelle Informationen rund um ThurSky.",
-    canonicalPath: "/news/",
-    body: `
-      <section>
-        <div class="section-heading">
-          <p class="eyebrow">Neuigkeiten und Projekte</p>
-          <h2>Aktuelle Beiträge</h2>
-          <p>
-            Hier findest du Neuigkeiten, Einblicke hinter die Kulissen
-            und Informationen zu aktuellen Drohnenprojekten.
-          </p>
-        </div>
-
-        <div class="news-grid">
-          ${cards}
-        </div>
-
-        <div class="button-row">
-          <a class="back-link" href="/">← Zurück zur Startseite</a>
-        </div>
-      </section>
-    `,
-  });
-}
-
-function renderPost(post) {
-  const image = post.image
-    ? `<img
-        class="article-hero"
-        src="${escapeHtml(post.image)}"
-        alt="${escapeHtml(post.title)}"
-      >`
-    : "";
-
-  return layout({
-    title: post.title,
-    description: post.description,
-    heroTitle: post.title,
-    heroText: post.description || "Aktuelles von ThurSky.",
-    canonicalPath: `/news/${encodeURIComponent(post.slug)}/`,
-    body: `
-      <article class="box article">
-        <p class="news-date">${formatDate(post.date)}</p>
-        <h1>${escapeHtml(post.title)}</h1>
-        ${
-          post.description
-            ? `<p class="article-lead">${escapeHtml(post.description)}</p>`
-            : ""
-        }
-        ${image}
-        <div class="article-body">
-          ${post.html}
-        </div>
-        <div class="button-row">
-          <a class="back-link" href="/news/">← Zurück zu allen News</a>
-          <a class="button" href="/">Zur Startseite</a>
-        </div>
-      </article>
-    `,
-  });
-}
-
 function formatDate(value) {
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-
   return new Intl.DateTimeFormat("de-CH", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  }).format(date);
+    dateStyle: "long",
+  }).format(new Date(value));
 }
 
 function escapeHtml(value) {
@@ -819,6 +853,13 @@ function escapeHtml(value) {
 }
 '''
 
-out = Path("/mnt/data/build-news.mjs")
-out.write_text(script, encoding="utf-8")
-print(out)
+(base / "news" / "index.html").write_text(news_html, encoding="utf-8")
+(base / "scripts" / "build-news.mjs").write_text(build_script, encoding="utf-8")
+
+zip_path = Path("/mnt/data/thursky-news-variante2.zip")
+with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
+    for p in base.rglob("*"):
+        if p.is_file():
+            z.write(p, p.relative_to(base))
+
+print(zip_path)

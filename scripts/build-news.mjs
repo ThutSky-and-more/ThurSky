@@ -1,8 +1,5 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import matter from "gray-matter";
-import { marked } from "marked";
-import sanitizeHtml from "sanitize-html";
 
 const root = process.cwd();
 const sourceDir = path.join(root, "content", "news");
@@ -17,14 +14,11 @@ const posts = [];
 
 for (const filename of files) {
   const raw = await fs.readFile(path.join(sourceDir, filename), "utf8");
-  const { data, content } = matter(raw);
+  const { data, content } = parseFrontMatter(raw);
   if (data.published === false) continue;
 
   const slug = filename.replace(/\.md$/i, "");
-  const html = sanitizeHtml(marked.parse(content), {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "h1", "h2"]),
-    allowedAttributes: { a: ["href", "target", "rel"], img: ["src", "alt"] }
-  });
+  const html = renderMarkdown(content);
 
   const post = {
     slug,
@@ -70,4 +64,59 @@ function formatDate(value) {
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
+}
+
+function parseFrontMatter(source) {
+  const match = source.match(/^---\s*\r?\n([\s\S]*?)\r?\n---\s*(?:\r?\n|$)/);
+  if (!match) return { data: {}, content: source };
+
+  const data = {};
+  for (const line of match[1].split(/\r?\n/)) {
+    const separator = line.indexOf(":");
+    if (separator === -1) continue;
+
+    const key = line.slice(0, separator).trim();
+    const value = line.slice(separator + 1).trim();
+    if (key) data[key] = parseFrontMatterValue(value);
+  }
+
+  return { data, content: source.slice(match[0].length) };
+}
+
+function parseFrontMatterValue(value) {
+  if (value === "true") return true;
+  if (value === "false") return false;
+  if (value === "null" || value === "~") return null;
+  if (/^-?(?:\d+|\d*\.\d+)$/.test(value)) return Number(value);
+  if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+    return value.slice(1, -1);
+  }
+  return value;
+}
+
+function renderMarkdown(source) {
+  const blocks = source.trim().split(/\r?\n\s*\r?\n/).filter(Boolean);
+  return blocks.map((block) => {
+    const lines = block.split(/\r?\n/);
+    const heading = lines[0].match(/^(#{1,2})\s+(.+)$/);
+    if (heading && lines.length === 1) {
+      const level = heading[1].length;
+      return `<h${level}>${renderInlineMarkdown(heading[2])}</h${level}>`;
+    }
+
+    if (lines.every((line) => /^[-*]\s+/.test(line))) {
+      const items = lines.map((line) => `<li>${renderInlineMarkdown(line.replace(/^[-*]\s+/, ""))}</li>`).join("");
+      return `<ul>${items}</ul>`;
+    }
+
+    return `<p>${lines.map((line) => renderInlineMarkdown(line)).join("<br>")}</p>`;
+  }).join("\n");
+}
+
+function renderInlineMarkdown(source) {
+  let html = escapeHtml(source);
+  html = html.replace(/\[([^\]]+)]\((https?:\/\/[^\s)]+|\/[^\s)]*)\)/g, '<a href="$2" rel="noopener noreferrer">$1</a>');
+  html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+  return html;
 }

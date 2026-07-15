@@ -912,7 +912,7 @@ export default async () => {
     },
     "node_modules/@netlify/functions": {
       "version": "5.3.0",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@netlify/functions/-/functions-5.3.0.tgz",
+      "resolved": "https://registry.npmjs.org/@netlify/functions/-/functions-5.3.0.tgz",
       "integrity": "sha512-FP+xCoZMkMOUsKa4UdG/oiK/2md1/TxuXvqqieaMVMgDbFFMaHI8h0oHCViUY73kPbKV6HyzayaSXGYXKpBSoQ==",
       "license": "MIT",
       "dependencies": {
@@ -924,7 +924,7 @@ export default async () => {
     },
     "node_modules/@netlify/identity": {
       "version": "1.2.0",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@netlify/identity/-/identity-1.2.0.tgz",
+      "resolved": "https://registry.npmjs.org/@netlify/identity/-/identity-1.2.0.tgz",
       "integrity": "sha512-m1lW+OUsFVkG3Gyz7Z+V7iClvEj77EL8WtlsPjrBAcPCgXVj20xySVerTekJGSoNzrk1vvHPEyxzGY0HhEA6ZA==",
       "license": "MIT",
       "dependencies": {
@@ -936,7 +936,7 @@ export default async () => {
     },
     "node_modules/@netlify/types": {
       "version": "2.8.0",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@netlify/types/-/types-2.8.0.tgz",
+      "resolved": "https://registry.npmjs.org/@netlify/types/-/types-2.8.0.tgz",
       "integrity": "sha512-8/g0Pt6y6wXj5Ia5eeYLiXhRfWeqZXGXpGFeCiiQdUOem+FPtXdA4+YdGxqzWc7D0AvptKSO01KGeeVWHSu8Kg==",
       "license": "MIT",
       "engines": {
@@ -945,7 +945,7 @@ export default async () => {
     },
     "node_modules/@supabase/auth-js": {
       "version": "2.110.5",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@supabase/auth-js/-/auth-js-2.110.5.tgz",
+      "resolved": "https://registry.npmjs.org/@supabase/auth-js/-/auth-js-2.110.5.tgz",
       "integrity": "sha512-QSlI5CNeEefHP95/GbeMhNgr8aHEHiXFh8c1IWthYyI9ZzBwEigYzJFCw4Ff+GkL8OK9tArBmGGv6rpg5zLXSw==",
       "license": "MIT",
       "dependencies": {
@@ -957,7 +957,7 @@ export default async () => {
     },
     "node_modules/@supabase/functions-js": {
       "version": "2.110.5",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@supabase/functions-js/-/functions-js-2.110.5.tgz",
+      "resolved": "https://registry.npmjs.org/@supabase/functions-js/-/functions-js-2.110.5.tgz",
       "integrity": "sha512-nuQuoIoEGT8ukrwr6THlY5v50bSMJ2rqti1FFsGyDaC98POLmcFQVFFh23PVPhRsKWUxrFc0MpmEoHKa7CY4mg==",
       "license": "MIT",
       "dependencies": {
@@ -969,13 +969,13 @@ export default async () => {
     },
     "node_modules/@supabase/phoenix": {
       "version": "0.4.4",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@supabase/phoenix/-/phoenix-0.4.4.tgz",
+      "resolved": "https://registry.npmjs.org/@supabase/phoenix/-/phoenix-0.4.4.tgz",
       "integrity": "sha512-Gt0pqoXuIqX/8dvG0OKp/wMCobXNH3klNbUPBNyOfN0YA1IswrM3HyWFMOPk1Jy+BRaIyDPcFx4jLBwHNmlyfQ==",
       "license": "MIT"
     },
     "node_modules/@supabase/postgrest-js": {
       "version": "2.110.5",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@supabase/postgrest-js/-/postgrest-js-2.110.5.tgz",
+      "resolved": "https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-2.110.5.tgz",
       "integrity": "sha512-eObfgBjxLPzFakwMpUmsv8nuNPOhoDhzzN8cwvEvGkxkmuRIZcOCYH9+DRbpKnxh7tgsBZW+KWtaZI2j98b2/g==",
       "license": "MIT",
       "dependencies": {
@@ -987,7 +987,7 @@ export default async () => {
     },
     "node_modules/@supabase/realtime-js": {
       "version": "2.110.5",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@supabase/realtime-js/-/realtime-js-2.110.5.tgz",
+      "resolved": "https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.110.5.tgz",
       "integrity": "sha512-VtOZxw5jfrc37KgIfFdp9SOFJjtvJ0qU+gT8CPQjL7cqy4DJlaTXacw5aBBogLZksqAI0YN67qhlDaMKFwfOuw==",
       "license": "MIT",
       "dependencies": {
@@ -1000,7 +1000,7 @@ export default async () => {
     },
     "node_modules/@supabase/storage-js": {
       "version": "2.110.5",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@supabase/storage-js/-/storage-js-2.110.5.tgz",
+      "resolved": "https://registry.npmjs.org/@supabase/storage-js/-/storage-js-2.110.5.tgz",
       "integrity": "sha512-7GkOZlrYknVGVPyijoDbu5OXGvQ2oQ6dkU0juAkIMPZ9QgtmJ8IPrxe76zGSbmzbaC1GdKw7pqeXEi2HT67sbA==",
       "license": "MIT",
       "dependencies": {
@@ -1013,7 +1013,7 @@ export default async () => {
     },
     "node_modules/@supabase/supabase-js": {
       "version": "2.110.5",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/@supabase/supabase-js/-/supabase-js-2.110.5.tgz",
+      "resolved": "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.110.5.tgz",
       "integrity": "sha512-cAO1Nm+CCogRNVXN93bBkh0vjOdLM5e6J9gB/cHV9Lqni/gEmN2HJFrnn4NI33GYIfmlh4Wbm6siH+XXRgpexA==",
       "license": "MIT",
       "dependencies": {
@@ -1029,7 +1029,7 @@ export default async () => {
     },
     "node_modules/argparse": {
       "version": "1.0.10",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/argparse/-/argparse-1.0.10.tgz",
+      "resolved": "https://registry.npmjs.org/argparse/-/argparse-1.0.10.tgz",
       "integrity": "sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg==",
       "license": "MIT",
       "dependencies": {
@@ -1038,13 +1038,13 @@ export default async () => {
     },
     "node_modules/dayjs": {
       "version": "1.11.21",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/dayjs/-/dayjs-1.11.21.tgz",
+      "resolved": "https://registry.npmjs.org/dayjs/-/dayjs-1.11.21.tgz",
       "integrity": "sha512-98IT+HOahAisibz/yjKbzuOBwYcjJ7BCLPzARyHiyEBmRz4fatF+KPJszEHXsGYjUG234aH/cOjW1wwTbKUZlA==",
       "license": "MIT"
     },
     "node_modules/deepmerge": {
       "version": "4.3.1",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/deepmerge/-/deepmerge-4.3.1.tgz",
+      "resolved": "https://registry.npmjs.org/deepmerge/-/deepmerge-4.3.1.tgz",
       "integrity": "sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==",
       "engines": {
         "node": ">=0.10.0"
@@ -1052,7 +1052,7 @@ export default async () => {
     },
     "node_modules/dom-serializer": {
       "version": "3.1.1",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/dom-serializer/-/dom-serializer-3.1.1.tgz",
+      "resolved": "https://registry.npmjs.org/dom-serializer/-/dom-serializer-3.1.1.tgz",
       "integrity": "sha512-4MEa38/QexBob6gFNwu+EGdWvhJ1OKuNwdYY3Y3NyeWDQfnGeDYQUDfIRzWu5B5gsv03so2Uxd28YC6zrsx3Lw==",
       "dependencies": {
         "domelementtype": "^3.0.0",
@@ -1069,7 +1069,7 @@ export default async () => {
     },
     "node_modules/domelementtype": {
       "version": "3.0.0",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/domelementtype/-/domelementtype-3.0.0.tgz",
+      "resolved": "https://registry.npmjs.org/domelementtype/-/domelementtype-3.0.0.tgz",
       "integrity": "sha512-umCQid3jKbDmVjx8jGaW7uUykm4DEUeyV21hPxNMo2nV955DhUThwqyOIDtreepP31hl84X7G5U9ZfsWvIB3Pg==",
       "funding": [
         {
@@ -1084,7 +1084,7 @@ export default async () => {
     },
     "node_modules/domhandler": {
       "version": "6.0.1",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/domhandler/-/domhandler-6.0.1.tgz",
+      "resolved": "https://registry.npmjs.org/domhandler/-/domhandler-6.0.1.tgz",
       "integrity": "sha512-gYzvtM72ZtxQO0T048kd6HWSbbGCNOUwcnfQ01cqIJ4X2IYKFFHZ5mKvrQETcFXxsRObZulDaKmy//R7TPtsBg==",
       "license": "BSD-2-Clause",
       "dependencies": {
@@ -1100,7 +1100,7 @@ export default async () => {
     },
     "node_modules/domutils": {
       "version": "4.0.2",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/domutils/-/domutils-4.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/domutils/-/domutils-4.0.2.tgz",
       "integrity": "sha512-qI4JLRKnSzqFqr7hAlS5xQDusBCjKSEG4t4+7aNrIQMHBcsC2TGEhuyABJdYkgSewL57PNLYEiibY2iPKhKpaA==",
       "license": "BSD-2-Clause",
       "dependencies": {
@@ -1118,7 +1118,7 @@ export default async () => {
     },
     "node_modules/entities": {
       "version": "8.0.0",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/entities/-/entities-8.0.0.tgz",
+      "resolved": "https://registry.npmjs.org/entities/-/entities-8.0.0.tgz",
       "integrity": "sha512-zwfzJecQ/Uej6tusMqwAqU/6KL2XaB2VZ2Jg54Je6ahNBGNH6Ek6g3jjNCF0fG9EWQKGZNddNjU5F1ZQn/sBnA==",
       "license": "BSD-2-Clause",
       "engines": {
@@ -1130,7 +1130,7 @@ export default async () => {
     },
     "node_modules/escape-string-regexp": {
       "version": "4.0.0",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/escape-string-regexp/-/escape-string-regexp-4.0.0.tgz",
+      "resolved": "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-4.0.0.tgz",
       "integrity": "sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==",
       "license": "MIT",
       "engines": {
@@ -1142,7 +1142,7 @@ export default async () => {
     },
     "node_modules/esprima": {
       "version": "4.0.1",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/esprima/-/esprima-4.0.1.tgz",
+      "resolved": "https://registry.npmjs.org/esprima/-/esprima-4.0.1.tgz",
       "integrity": "sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==",
       "license": "BSD-2-Clause",
       "bin": {
@@ -1155,7 +1155,7 @@ export default async () => {
     },
     "node_modules/extend-shallow": {
       "version": "2.0.1",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/extend-shallow/-/extend-shallow-2.0.1.tgz",
+      "resolved": "https://registry.npmjs.org/extend-shallow/-/extend-shallow-2.0.1.tgz",
       "integrity": "sha512-zCnTtlxNoAiDc3gqY2aYAWFx7XWWiasuF2K8Me5WbN8otHKTUKBwjPtNpRs/rbUZm7KxWAaNj7P1a/p52GbVug==",
       "license": "MIT",
       "dependencies": {
@@ -1167,13 +1167,13 @@ export default async () => {
     },
     "node_modules/gotrue-js": {
       "version": "1.0.1",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/gotrue-js/-/gotrue-js-1.0.1.tgz",
+      "resolved": "https://registry.npmjs.org/gotrue-js/-/gotrue-js-1.0.1.tgz",
       "integrity": "sha512-ZynwwM4bEo2y5yNWO3/Ynbx1AvQz9ONJSM9tB1jpooAvDPevGdvgeFP3NwM59FAlkd0szSkQRAhjINMkJSDfAQ==",
       "license": "MIT"
     },
     "node_modules/gray-matter": {
       "version": "4.0.3",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/gray-matter/-/gray-matter-4.0.3.tgz",
+      "resolved": "https://registry.npmjs.org/gray-matter/-/gray-matter-4.0.3.tgz",
       "integrity": "sha512-5v6yZd4JK3eMI3FqqCouswVqwugaA9r4dNZB1wwcmrD02QkV5H0y7XBQW8QwQqEaZY1pM9aqORSORhJRdNK44Q==",
       "license": "MIT",
       "dependencies": {
@@ -1188,7 +1188,7 @@ export default async () => {
     },
     "node_modules/htmlparser2": {
       "version": "12.0.0",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/htmlparser2/-/htmlparser2-12.0.0.tgz",
+      "resolved": "https://registry.npmjs.org/htmlparser2/-/htmlparser2-12.0.0.tgz",
       "integrity": "sha512-Tz7u1i95/g2x2jz81+x0FBVhBhY5aRTvD3tXXdFaljuNdzDLJ8UGNRrTcj2cgQvAg3iW/h77Fz15nLW0L0CrZw==",
       "funding": [
         "https://github.com/fb55/htmlparser2?sponsor=1",
@@ -1210,7 +1210,7 @@ export default async () => {
     },
     "node_modules/iceberg-js": {
       "version": "0.8.1",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/iceberg-js/-/iceberg-js-0.8.1.tgz",
+      "resolved": "https://registry.npmjs.org/iceberg-js/-/iceberg-js-0.8.1.tgz",
       "integrity": "sha512-1dhVQZXhcHje7798IVM+xoo/1ZdVfzOMIc8/rgVSijRK38EDqOJoGula9N/8ZI5RD8QTxNQtK/Gozpr+qUqRRA==",
       "license": "MIT",
       "engines": {
@@ -1219,7 +1219,7 @@ export default async () => {
     },
     "node_modules/is-extendable": {
       "version": "0.1.1",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/is-extendable/-/is-extendable-0.1.1.tgz",
+      "resolved": "https://registry.npmjs.org/is-extendable/-/is-extendable-0.1.1.tgz",
       "integrity": "sha512-5BMULNob1vgFX6EjQw5izWDxrecWK9AM72rugNr0TFldMOi0fj6Jk+zeKIt0xGj4cEfQIJth4w3OKWOJ4f+AFw==",
       "license": "MIT",
       "engines": {
@@ -1228,7 +1228,7 @@ export default async () => {
     },
     "node_modules/is-plain-object": {
       "version": "5.0.0",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/is-plain-object/-/is-plain-object-5.0.0.tgz",
+      "resolved": "https://registry.npmjs.org/is-plain-object/-/is-plain-object-5.0.0.tgz",
       "integrity": "sha512-VRSzKkbMm5jMDoKLbltAkFQ5Qr7VDiTFGXxYFXXowVj387GeGNOCsOH6Msy00SGZ3Fp84b1Naa1psqgcCIEP5Q==",
       "license": "MIT",
       "engines": {
@@ -1237,7 +1237,7 @@ export default async () => {
     },
     "node_modules/js-yaml": {
       "version": "3.15.0",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/js-yaml/-/js-yaml-3.15.0.tgz",
+      "resolved": "https://registry.npmjs.org/js-yaml/-/js-yaml-3.15.0.tgz",
       "integrity": "sha512-ttBQIIQPDeLjpPOohtUdXuXUVoA2uIB6fEH9HyJ7234s5mBJ5wTx20njxplLZQgLaOfpmPQA7X2t5AX6tIPbog==",
       "dependencies": {
         "argparse": "^1.0.7",
@@ -1249,7 +1249,7 @@ export default async () => {
     },
     "node_modules/kind-of": {
       "version": "6.0.3",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/kind-of/-/kind-of-6.0.3.tgz",
+      "resolved": "https://registry.npmjs.org/kind-of/-/kind-of-6.0.3.tgz",
       "integrity": "sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==",
       "license": "MIT",
       "engines": {
@@ -1258,7 +1258,7 @@ export default async () => {
     },
     "node_modules/launder": {
       "version": "1.7.1",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/launder/-/launder-1.7.1.tgz",
+      "resolved": "https://registry.npmjs.org/launder/-/launder-1.7.1.tgz",
       "integrity": "sha512-mU6WRz5EusL9ZZuiZ5SO4Y6C0P9PAUR9iwdb6bzj4KDihm28DiHFw+/yk9DBH4f+Pv1wuzQ4e2jV3oQ7mkIqvw==",
       "license": "MIT",
       "dependencies": {
@@ -1267,7 +1267,7 @@ export default async () => {
     },
     "node_modules/marked": {
       "version": "18.0.6",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/marked/-/marked-18.0.6.tgz",
+      "resolved": "https://registry.npmjs.org/marked/-/marked-18.0.6.tgz",
       "integrity": "sha512-MrV5puXBfuiy6wl6DLaq3BtIJQAJToAd5zt/ZKhRfGRAuFPALE7/4Y7jnxRQoEgK/pBgurGqLyAuRgZ2xOjr6w==",
       "license": "MIT",
       "bin": {
@@ -1279,7 +1279,7 @@ export default async () => {
     },
     "node_modules/nanoid": {
       "version": "3.3.16",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/nanoid/-/nanoid-3.3.16.tgz",
+      "resolved": "https://registry.npmjs.org/nanoid/-/nanoid-3.3.16.tgz",
       "integrity": "sha512-bzlKTyNJ7+LdGIIwy8ijFpIqEQIvafahV7eYykJ8Cvh42EdJeODoJ6gUJXpQJvej1BddH8OqTXZNE/KfbWAu8Q==",
       "funding": [
         {
@@ -1297,7 +1297,7 @@ export default async () => {
     },
     "node_modules/netlify-cli": {
       "version": "23.15.1",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/netlify-cli/-/netlify-cli-23.15.1.tgz",
+      "resolved": "https://registry.npmjs.org/netlify-cli/-/netlify-cli-23.15.1.tgz",
       "integrity": "sha512-89N5qfdvdz0ceelQ2luSBmy83kZ7MXGKWNBIu8LAt8y71uPX6+rK0T2C4vBU4uq2Mz9DZyOVVHHy+OyTRC0o1A==",
       "dev": true,
       "hasInstallScript": true,
@@ -16941,19 +16941,19 @@ export default async () => {
     },
     "node_modules/parse-srcset": {
       "version": "1.0.2",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/parse-srcset/-/parse-srcset-1.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/parse-srcset/-/parse-srcset-1.0.2.tgz",
       "integrity": "sha512-/2qh0lav6CmI15FzA3i/2Bzk2zCgQhGMkvhOhKNcBVQ1ldgpbfiNTVslmooUmWJcADi1f1kIeynbDRVzNlfR6Q==",
       "license": "MIT"
     },
     "node_modules/picocolors": {
       "version": "1.1.1",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/picocolors/-/picocolors-1.1.1.tgz",
+      "resolved": "https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz",
       "integrity": "sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==",
       "license": "ISC"
     },
     "node_modules/postcss": {
       "version": "8.5.19",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/postcss/-/postcss-8.5.19.tgz",
+      "resolved": "https://registry.npmjs.org/postcss/-/postcss-8.5.19.tgz",
       "integrity": "sha512-Mz8SaolMd8nB+G13WkORcxQKHZ/NE4xXevtkJHVuG+guo9/wYKlIMTKAqGdEmYOXR2ijPjTYNHssizdaVSUNdQ==",
       "funding": [
         {
@@ -16981,7 +16981,7 @@ export default async () => {
     },
     "node_modules/sanitize-html": {
       "version": "2.17.6",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/sanitize-html/-/sanitize-html-2.17.6.tgz",
+      "resolved": "https://registry.npmjs.org/sanitize-html/-/sanitize-html-2.17.6.tgz",
       "integrity": "sha512-M4bo9tfv1yfhQZZKkc6dL07ALrGJtfvNOuhX3hU9AVPR/uPQ+nKOJBqTYc7LfMQblTW04mtSWDJWEyLvygJsLA==",
       "license": "MIT",
       "dependencies": {
@@ -16999,7 +16999,7 @@ export default async () => {
     },
     "node_modules/section-matter": {
       "version": "1.0.0",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/section-matter/-/section-matter-1.0.0.tgz",
+      "resolved": "https://registry.npmjs.org/section-matter/-/section-matter-1.0.0.tgz",
       "integrity": "sha512-vfD3pmTzGpufjScBh50YHKzEu2lxBWhVEHsNGoEXmCmn2hKGfeNLYMzCJpe8cD7gqX7TJluOVpBkAequ6dgMmA==",
       "license": "MIT",
       "dependencies": {
@@ -17012,7 +17012,7 @@ export default async () => {
     },
     "node_modules/source-map-js": {
       "version": "1.2.1",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/source-map-js/-/source-map-js-1.2.1.tgz",
+      "resolved": "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.1.tgz",
       "integrity": "sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==",
       "license": "BSD-3-Clause",
       "engines": {
@@ -17021,13 +17021,13 @@ export default async () => {
     },
     "node_modules/sprintf-js": {
       "version": "1.0.3",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/sprintf-js/-/sprintf-js-1.0.3.tgz",
+      "resolved": "https://registry.npmjs.org/sprintf-js/-/sprintf-js-1.0.3.tgz",
       "integrity": "sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==",
       "license": "BSD-3-Clause"
     },
     "node_modules/strip-bom-string": {
       "version": "1.0.0",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/strip-bom-string/-/strip-bom-string-1.0.0.tgz",
+      "resolved": "https://registry.npmjs.org/strip-bom-string/-/strip-bom-string-1.0.0.tgz",
       "integrity": "sha512-uCC2VHvQRYu+lMh4My/sFNmF2klFymLX1wHJeXnbEJERpV/ZsVuonzerjfrGpIGF7LBVa1O7i9kjiWvJiFck8g==",
       "license": "MIT",
       "engines": {
@@ -17036,7 +17036,7 @@ export default async () => {
     },
     "node_modules/tslib": {
       "version": "2.8.1",
-      "resolved": "https://packages.applied-caas-gateway1.internal.api.openai.org/artifactory/api/npm/npm-public/tslib/-/tslib-2.8.1.tgz",
+      "resolved": "https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz",
       "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==",
       "license": "0BSD"
     }

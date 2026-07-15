@@ -1,19 +1,20 @@
-<!doctype html>
-<html lang="de">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Galerie | ThurSky</title>
-  <meta name="description" content="Drohnenbilder und Videos von ThurSky aus dem Thurgau.">
-  <link rel="stylesheet" href="/assets/css/style.css">
-  
-</head>
-<body>
-<header class="site-header">
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Galerie | ThurSky</title><meta name="description" content="Galerie mit Drohnenfotos und Videos von ThurSky."><style>
+:root{--dark:#256c70;--dark2:#1d5558;--accent:#f5a623;--bg:#f3f3f3;--card:#fff;--text:#222;--muted:#555;--shadow:0 12px 25px rgba(0,0,0,.15)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit}.site-header{background:var(--dark);padding:12px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.brand{display:flex;align-items:center}.brand img{height:62px;max-width:210px;object-fit:contain}.menu-toggle{display:block;background:none;border:0;color:#fff;font-size:36px;line-height:1;cursor:pointer;padding:7px 11px;border-radius:10px}.menu-toggle:hover,.menu-toggle:focus-visible{background:rgba(255,255,255,.12)}
+.main-nav{display:none;position:absolute;top:86px;right:18px;width:min(290px,calc(100vw - 36px));padding:13px;background:var(--dark);border-radius:18px;box-shadow:0 12px 28px rgba(0,0,0,.32);animation:fadeIn .2s ease}.main-nav.open{display:flex;flex-direction:column}.main-nav a{color:#fff;text-decoration:none;padding:13px 14px;border-radius:11px;font-size:16px}.main-nav a:hover,.main-nav a:focus-visible{background:rgba(255,255,255,.12);color:var(--accent)}.main-nav .account-link{background:var(--accent);color:#222;margin-top:7px;font-weight:700}.main-nav .account-link:hover{background:#ffb73a;color:#111}
+.hero{min-height:52vh;background-image:linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),url('/assets/images/hero.jpg'),url('/hero.jpg');background-position:center;background-size:cover;display:grid;place-items:center;text-align:center;color:#fff;padding:30px 18px;border-radius:0 0 30px 30px}.hero-inner{max-width:850px}.hero h1{font-size:clamp(34px,7vw,64px);margin:0 0 12px}.hero p{font-size:clamp(17px,2.4vw,23px);color:#fff;margin:0}.hero-small{min-height:32vh}
+main{max-width:1200px;margin:auto;padding:42px 16px}.box{background:var(--card);padding:28px 24px;border-radius:20px;box-shadow:var(--shadow);margin-bottom:28px;line-height:1.65;transition:transform .25s,box-shadow .25s}.box:hover{transform:translateY(-4px);box-shadow:0 18px 30px rgba(0,0,0,.2)}h1,h2,h3{margin-top:0}p{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}.card{background:#fff;border-radius:18px;overflow:hidden;box-shadow:var(--shadow)}.card img{width:100%;height:220px;object-fit:cover}.card-content{padding:18px}.button,.primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 18px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--dark),#333);color:#fff;text-decoration:none;font-weight:700;cursor:pointer}.button:hover,.primary:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,0,0,.2)}.button-accent{background:var(--accent);color:#222}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}.gallery img,.gallery video{width:100%;height:185px;object-fit:cover;border-radius:16px;box-shadow:0 8px 18px rgba(0,0,0,.14)}.gallery img{cursor:pointer;transition:transform .25s}.gallery img:hover{transform:scale(1.03)}
+.price-list{display:grid;gap:12px}.price-item{display:flex;justify-content:space-between;gap:18px;padding:14px 18px;border-radius:12px;background:rgba(245,166,35,.08);font-weight:600}.map{width:100%;height:320px;border:0;border-radius:18px}label{font-weight:650;display:block;margin-bottom:6px}input,select,textarea{width:100%;padding:13px 14px;margin-bottom:16px;border:1px solid #d5d5d5;border-radius:12px;font:inherit;background:#fff}input:focus,select:focus,textarea:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px rgba(245,166,35,.2)}.form-grid{display:grid;grid-template-columns:1fr;gap:0 16px}.notice{padding:14px 16px;border-radius:12px;background:#eef8f8;border:1px solid #bfdede;color:#244}.login-card{text-align:center;max-width:680px;margin:0 auto}.login-card .actions{justify-content:center}.hidden{display:none!important}.orders{display:grid;gap:14px}.order{padding:16px;border:1px solid #ddd;border-radius:14px;background:#fff}.status{display:inline-block;padding:5px 10px;border-radius:999px;background:#eef5f5;color:var(--dark2);font-weight:700;font-size:14px}
+.site-footer{background:var(--dark);color:#fff;text-align:center;padding:25px 18px;border-radius:30px 30px 0 0}.site-footer p{color:#fff;margin:0 0 8px}.site-footer a{color:#fff}.lightbox{display:none;position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.94);align-items:center;justify-content:center;padding:30px}.lightbox.open{display:flex}.lightbox img{max-width:92vw;max-height:88vh;border-radius:12px}.lightbox-close{position:absolute;top:15px;right:22px;background:none;border:0;color:#fff;font-size:42px;cursor:pointer}@keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@media(min-width:760px){.brand img{height:70px}.form-grid{grid-template-columns:repeat(2,1fr)}main{padding:52px 24px}.main-nav{top:94px}.gallery img,.gallery video{height:210px}}
+</style></head><body><header class="site-header">
   <a class="brand" href="/" aria-label="ThurSky Startseite">
-    <img src="/assets/images/logo.png" alt="ThurSky Logo">
+    <img src="/assets/images/logo.png" onerror="this.onerror=null;this.src='/logo.png';" alt="ThurSky Logo">
   </a>
-  <button class="menu-toggle" id="menuToggle" type="button" aria-label="Menü öffnen" aria-expanded="false">☰</button>
+  <button class="menu-toggle" id="menuToggle" aria-controls="mainNav" aria-expanded="false" aria-label="Menü öffnen">☰</button>
   <nav class="main-nav" id="mainNav" aria-label="Hauptnavigation">
     <a href="/">Start</a>
     <a href="/ueber-mich/">Ich &amp; Equipment</a>
@@ -25,48 +26,18 @@
     <a href="/kontakt/">Kontakt</a>
     <a class="account-link" href="/konto/">Kundenkonto</a>
   </nav>
-</header>
-<section class="subhero"><div><p class="hero-kicker">Einblicke</p><h1>Galerie</h1></div></section>
-<main class="page-shell"><section class="content-section"><article class="box"><h2>Fotos &amp; Videos</h2><p>Klicken Sie auf ein Bild, um es gross anzusehen.</p><div class="gallery-grid"><img src="/assets/images/gallery/BildPool.jpg" alt="Drohnenaufnahme 1" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0005.JPG" alt="Drohnenaufnahme 2" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0006.JPG" alt="Drohnenaufnahme 3" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0008.JPG" alt="Drohnenaufnahme 4" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0009.JPG" alt="Drohnenaufnahme 5" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0010.JPG" alt="Drohnenaufnahme 6" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0012.JPG" alt="Drohnenaufnahme 7" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0013.JPG" alt="Drohnenaufnahme 8" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0018.JPG" alt="Drohnenaufnahme 9" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0019.JPG" alt="Drohnenaufnahme 10" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0021.JPG" alt="Drohnenaufnahme 11" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0022.JPG" alt="Drohnenaufnahme 12" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0136.JPG" alt="Drohnenaufnahme 13" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0138.JPG" alt="Drohnenaufnahme 14" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0142.JPG" alt="Drohnenaufnahme 15" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0143.JPG" alt="Drohnenaufnahme 16" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0424.JPG" alt="Drohnenaufnahme 17" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0299.JPG" alt="Drohnenaufnahme 18" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0317.JPG" alt="Drohnenaufnahme 19" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0309.JPG" alt="Drohnenaufnahme 20" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0433.JPG" alt="Drohnenaufnahme 21" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0439.JPG" alt="Drohnenaufnahme 22" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0440.JPG" alt="Drohnenaufnahme 23" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0442.JPG" alt="Drohnenaufnahme 24" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0446.JPG" alt="Drohnenaufnahme 25" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0451.JPG" alt="Drohnenaufnahme 26" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0454.JPG" alt="Drohnenaufnahme 27" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0457.JPG" alt="Drohnenaufnahme 28" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0458.JPG" alt="Drohnenaufnahme 29" loading="lazy" data-lightbox>
-<img src="/assets/images/gallery/DJI_0463.jpg" alt="Drohnenaufnahme 30" loading="lazy" data-lightbox><video controls preload="metadata"><source src="/assets/videos/DJI_0447.MP4" type="video/mp4">Ihr Browser unterstützt dieses Video nicht.</video>
-<video controls preload="metadata"><source src="/assets/videos/DJI_0437.MP4" type="video/mp4">Ihr Browser unterstützt dieses Video nicht.</video>
-<video controls preload="metadata"><source src="/assets/videos/DJI_0015.MP4" type="video/mp4">Ihr Browser unterstützt dieses Video nicht.</video>
-<video controls preload="metadata"><source src="/assets/videos/DJI_0159.MP4" type="video/mp4">Ihr Browser unterstützt dieses Video nicht.</video>
-<video controls preload="metadata"><source src="/assets/videos/DJI_0376.MP4" type="video/mp4">Ihr Browser unterstützt dieses Video nicht.</video></div></article></section></main>
-<div class="lightbox" id="lightbox" aria-hidden="true"><button class="lightbox-close" type="button" aria-label="Schliessen">×</button><button class="lightbox-nav lightbox-prev" type="button" aria-label="Vorheriges Bild">❮</button><img id="lightboxImage" alt="Vergrösserte Drohnenaufnahme"><button class="lightbox-nav lightbox-next" type="button" aria-label="Nächstes Bild">❯</button></div>
-<footer class="site-footer">
-  <div>ThurSky © <span id="year"></span> · <a href="/impressum.html">Impressum</a></div>
-  <a class="instagram-link" href="https://instagram.com/ThurSky.ch" target="_blank" rel="noopener">Instagram</a>
-</footer>
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-<script type="module" src="/assets/js/main.js"></script>
-</body>
-</html>
+</header><section class="hero hero-small"><div class="hero-inner"><h1>Galerie</h1><p>Drohnenaufnahmen aus dem Thurgau</p></div></section><main><section class="box"><h2>Galerie</h2><p>Klicken Sie auf ein Bild, um es gross zu öffnen.</p><div class="gallery" id="gallery"><img src="/assets/images/gallery/BildPool.jpg" onerror="this.onerror=null;this.src='/BildPool.jpg';" alt="Drohnenaufnahme BildPool.jpg" loading="lazy"><img src="/assets/images/gallery/DJI_0005.JPG" onerror="this.onerror=null;this.src='/DJI_0005.JPG';" alt="Drohnenaufnahme DJI_0005.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0006.JPG" onerror="this.onerror=null;this.src='/DJI_0006.JPG';" alt="Drohnenaufnahme DJI_0006.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0008.JPG" onerror="this.onerror=null;this.src='/DJI_0008.JPG';" alt="Drohnenaufnahme DJI_0008.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0009.JPG" onerror="this.onerror=null;this.src='/DJI_0009.JPG';" alt="Drohnenaufnahme DJI_0009.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0010.JPG" onerror="this.onerror=null;this.src='/DJI_0010.JPG';" alt="Drohnenaufnahme DJI_0010.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0012.JPG" onerror="this.onerror=null;this.src='/DJI_0012.JPG';" alt="Drohnenaufnahme DJI_0012.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0013.JPG" onerror="this.onerror=null;this.src='/DJI_0013.JPG';" alt="Drohnenaufnahme DJI_0013.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0018.JPG" onerror="this.onerror=null;this.src='/DJI_0018.JPG';" alt="Drohnenaufnahme DJI_0018.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0019.JPG" onerror="this.onerror=null;this.src='/DJI_0019.JPG';" alt="Drohnenaufnahme DJI_0019.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0021.JPG" onerror="this.onerror=null;this.src='/DJI_0021.JPG';" alt="Drohnenaufnahme DJI_0021.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0022.JPG" onerror="this.onerror=null;this.src='/DJI_0022.JPG';" alt="Drohnenaufnahme DJI_0022.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0136.JPG" onerror="this.onerror=null;this.src='/DJI_0136.JPG';" alt="Drohnenaufnahme DJI_0136.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0138.JPG" onerror="this.onerror=null;this.src='/DJI_0138.JPG';" alt="Drohnenaufnahme DJI_0138.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0142.JPG" onerror="this.onerror=null;this.src='/DJI_0142.JPG';" alt="Drohnenaufnahme DJI_0142.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0143.JPG" onerror="this.onerror=null;this.src='/DJI_0143.JPG';" alt="Drohnenaufnahme DJI_0143.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0424.JPG" onerror="this.onerror=null;this.src='/DJI_0424.JPG';" alt="Drohnenaufnahme DJI_0424.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0299.JPG" onerror="this.onerror=null;this.src='/DJI_0299.JPG';" alt="Drohnenaufnahme DJI_0299.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0317.JPG" onerror="this.onerror=null;this.src='/DJI_0317.JPG';" alt="Drohnenaufnahme DJI_0317.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0309.JPG" onerror="this.onerror=null;this.src='/DJI_0309.JPG';" alt="Drohnenaufnahme DJI_0309.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0433.JPG" onerror="this.onerror=null;this.src='/DJI_0433.JPG';" alt="Drohnenaufnahme DJI_0433.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0439.JPG" onerror="this.onerror=null;this.src='/DJI_0439.JPG';" alt="Drohnenaufnahme DJI_0439.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0440.JPG" onerror="this.onerror=null;this.src='/DJI_0440.JPG';" alt="Drohnenaufnahme DJI_0440.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0442.JPG" onerror="this.onerror=null;this.src='/DJI_0442.JPG';" alt="Drohnenaufnahme DJI_0442.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0446.JPG" onerror="this.onerror=null;this.src='/DJI_0446.JPG';" alt="Drohnenaufnahme DJI_0446.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0451.JPG" onerror="this.onerror=null;this.src='/DJI_0451.JPG';" alt="Drohnenaufnahme DJI_0451.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0454.JPG" onerror="this.onerror=null;this.src='/DJI_0454.JPG';" alt="Drohnenaufnahme DJI_0454.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0457.JPG" onerror="this.onerror=null;this.src='/DJI_0457.JPG';" alt="Drohnenaufnahme DJI_0457.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0458.JPG" onerror="this.onerror=null;this.src='/DJI_0458.JPG';" alt="Drohnenaufnahme DJI_0458.JPG" loading="lazy"><img src="/assets/images/gallery/DJI_0463.jpg" onerror="this.onerror=null;this.src='/DJI_0463.jpg';" alt="Drohnenaufnahme DJI_0463.jpg" loading="lazy"><video controls preload="metadata"><source src="/assets/videos/DJI_0447.MP4" type="video/mp4"></video><video controls preload="metadata"><source src="/assets/videos/DJI_0437.MP4" type="video/mp4"></video><video controls preload="metadata"><source src="/assets/videos/DJI_0015.MP4" type="video/mp4"></video><video controls preload="metadata"><source src="/assets/videos/DJI_0159.MP4" type="video/mp4"></video><video controls preload="metadata"><source src="/assets/videos/DJI_0376.MP4" type="video/mp4"></video></div></section><div class="lightbox" id="lightbox"><button class="lightbox-close" id="lightboxClose" aria-label="Schliessen">×</button><img id="lightboxImage" alt="Vergrösserte Aufnahme"></div></main><footer class="site-footer">
+  <p>ThurSky © 2026 · <a href="/impressum.html">Impressum</a></p>
+  <a href="https://instagram.com/ThurSky.ch" target="_blank" rel="noopener">Instagram</a>
+</footer><script>
+(function(){
+ const btn=document.getElementById('menuToggle'); const nav=document.getElementById('mainNav');
+ if(btn&&nav){
+  const close=()=>{nav.classList.remove('open');btn.setAttribute('aria-expanded','false');btn.textContent='☰'};
+  btn.addEventListener('click',e=>{e.stopPropagation();const open=nav.classList.toggle('open');btn.setAttribute('aria-expanded',String(open));btn.textContent=open?'✕':'☰'});
+  nav.addEventListener('click',e=>{if(e.target.closest('a'))close()});
+  document.addEventListener('click',e=>{if(!nav.contains(e.target)&&e.target!==btn)close()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+ }
+})();
+</script><script>(function(){const lb=document.getElementById('lightbox'),out=document.getElementById('lightboxImage'),close=document.getElementById('lightboxClose');document.querySelectorAll('#gallery img').forEach(img=>img.addEventListener('click',()=>{out.src=img.src;lb.classList.add('open')}));function c(){lb.classList.remove('open');out.src=''}close.addEventListener('click',c);lb.addEventListener('click',e=>{if(e.target===lb)c()});document.addEventListener('keydown',e=>{if(e.key==='Escape')c()})})();</script></body></html>

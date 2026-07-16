@@ -12,4 +12,7 @@
 <section class="hero small"><div class="hero-content"><h1>Admin-Backend</h1><p>Bestellungen, Status und Kundendateien verwalten.</p></div></section>
 <main><section class="box" data-admin-gate><h2>Admin-Anmeldung erforderlich</h2><p>Dieser Bereich ist nur für Benutzer mit der Netlify-Identity-Rolle <code>admin</code> freigegeben.</p><button class="btn btn-primary" data-login type="button">Als Admin einloggen</button></section><section class="hidden" data-admin-app><div class="admin-layout"><aside class="box admin-sidebar"><h2>Verwaltung</h2><p>Bestellungen prüfen, Status ändern, Kundennachrichten schreiben und Dateien freigeben.</p><div class="btn-row"><a class="btn btn-accent btn-block" href="/admin/">Decap CMS öffnen</a><button class="btn btn-danger btn-block" data-logout type="button">Abmelden</button></div></aside><div><div class="grid grid-4" data-admin-stats></div><div data-admin-notice></div><div data-admin-orders></div></div></div></section></main>
 <footer class="site-footer"><div class="footer-inner"><div>ThurSky © 2026 · Drohnenaufnahmen im Thurgau</div><div class="footer-links"><a href="/kontakt/">Kontakt</a><a href="/impressum.html">Impressum</a><a href="https://instagram.com/ThurSky.ch" target="_blank" rel="noopener">Instagram</a></div></div></footer>
-</body></html>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script type="module" src="/assets/js/admin.js"></script>
+</body>
+</html>

@@ -1,3 +1,12 @@
 {
-  "posts": []
+  "posts": [
+    {
+      "published": true,
+      "title": "Wilkommen",
+      "date": "2026-07-16T12:40:00+02:00",
+      "description": "Das ist die neue Website von Thursky.",
+      "image": "/assets/images/uploads/logo.png",
+      "body": "Mit vielen neuen Funktionen für unsere Kunden.\n"
+    }
+  ]
 }

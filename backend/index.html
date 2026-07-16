@@ -443,12 +443,15 @@
   </footer>
 
   <!-- Netlify Identity muss vor admin.js geladen werden -->
-  <script
-    src="https://identity.netlify.com/v1/netlify-identity-widget.js"
-  ></script>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="/assets/js/admin.js?v=10"></script>
   <!-- admin.js verwendet JavaScript-Imports -->
- <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-<script type="module" src="/assets/js/admin.js"></script>
+  <script
+    type="module"
+    src="/assets/js/admin.js"
+  ></script>
 </body>
 </html>

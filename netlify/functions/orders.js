@@ -262,11 +262,20 @@ async function listOrders(event, supabase, user) {
    * Die Tabelle "order_files" wird später separat behandelt.
    */
   let query = supabase
-    .from("orders")
-    .select("*")
-    .order("created_at", {
-      ascending: false,
-    });
+  .from("orders")
+  .select(`
+    *,
+    order_files (
+      id,
+      original_name,
+      mime_type,
+      size_bytes,
+      created_at
+    )
+  `)
+  .order("created_at", {
+    ascending: false
+  });
 
   /*
    * Kunden sehen nur ihre eigenen Bestellungen.
@@ -300,11 +309,22 @@ async function listOrders(event, supabase, user) {
     );
   }
 
-  return json(200, {
-    ok: true,
-    orders: data || [],
-    version: VERSION,
-  });
+const orders = (data || []).map(
+  (order) => ({
+    ...order,
+    files:
+      Array.isArray(order.order_files)
+        ? order.order_files
+        : [],
+    order_files: undefined
+  })
+);
+
+return json(200, {
+  ok: true,
+  orders,
+  version: VERSION
+}); 
 }
 
 /* =========================================================

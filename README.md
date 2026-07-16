@@ -1,123 +1,210 @@
-# ThurSky – vollständige Einrichtung
+# 🚁 ThurSky – Drohnenaufnahmen aus dem Thurgau
 
-Dieses Projekt verbindet:
+Willkommen bei **ThurSky**!
 
-- GitHub für Versionsverwaltung und automatische Netlify-Deployments
-- Netlify Identity für Kunden- und Admin-Anmeldungen
-- Netlify Functions für geschützte Serverlogik
-- Supabase PostgreSQL für Bestellungen
-- Supabase Storage für private Kundenbilder und Videos
-- Decap CMS für öffentliche News-Beiträge im Git-Repository
+ThurSky ist eine moderne Website für professionelle Drohnenaufnahmen im Thurgau. Kunden können Leistungen anfragen, den Status ihrer Bestellung verfolgen und ihre fertigen Bilder oder Videos sicher herunterladen. Administratoren verwalten Bestellungen, Kunden und Inhalte bequem über ein eigenes Backend.
 
-## 1. Bilder kopieren
+---
 
-Lege deine Dateien so ab:
+# ✨ Funktionen
 
-- `assets/images/logo.png`
-- `assets/images/hero.jpg`
-- Galerie: `assets/images/gallery/...`
+## 🌐 Öffentliche Website
 
-Die Beispiel-Dateinamen in `index.html` müssen zu deinen echten Dateien passen. GitHub unterscheidet Gross- und Kleinschreibung.
+- Modernes responsives Design
+- Optimiert für Desktop, Tablet und Smartphone
+- Burger-Menü auf allen Geräten
+- Hero-Bereich
+- Leistungsübersicht
+- Galerie
+- News-System
+- Preisübersicht
+- Kontaktseite
+- Kundenkonto
+- Suchmaschinenoptimierung (SEO)
 
-## 2. GitHub
+---
 
-Im Projektordner:
+## 👤 Kundenkonto
 
-```bash
-git init
-git add .
-git commit -m "ThurSky Grundsystem"
-git branch -M main
-git remote add origin https://github.com/DEIN-NAME/DEIN-REPOSITORY.git
-git push -u origin main
+Nach der Anmeldung können Kunden:
+
+- Bestellungen ansehen
+- aktuellen Bearbeitungsstatus verfolgen
+- Nachrichten vom Administrator lesen
+- fertige Dateien herunterladen
+
+---
+
+## 🔒 Admin-Backend
+
+Administratoren können:
+
+- Bestellungen verwalten
+- Status ändern
+- Nachrichten an Kunden senden
+- Dateien hochladen
+- mehrere Dateien gleichzeitig hochladen
+- Kunden verwalten
+- neue Bestellungen erstellen
+- Decap CMS öffnen
+
+---
+
+## 📰 Decap CMS
+
+Inhalte können ohne Programmierkenntnisse bearbeitet werden.
+
+Unter anderem:
+
+- News
+- Galerie
+- Texte
+- Bilder
+
+---
+
+# ⚙️ Verwendete Technologien
+
+- HTML5
+- CSS3
+- JavaScript (Vanilla)
+- Netlify
+- Netlify Identity
+- Netlify Functions
+- Supabase
+- Supabase Storage
+- Decap CMS
+
+---
+
+# 📂 Projektstruktur
+
+```
+/
+│
+├── assets/
+│   ├── css/
+│   ├── js/
+│   ├── images/
+│   └── data/
+│
+├── backend/
+├── konto/
+├── galerie/
+├── leistungen/
+├── news/
+├── preise/
+├── bestellen/
+├── kontakt/
+├── ueber-mich/
+│
+├── netlify/
+│   └── functions/
+│
+├── admin/
+├── content/
+├── robots.txt
+├── sitemap.xml
+├── favicon.ico
+└── index.html
 ```
 
-## 3. Supabase
+---
 
-1. Neues Supabase-Projekt erstellen.
-2. SQL Editor öffnen.
-3. Inhalt von `supabase/schema.sql` ausführen.
-4. Unter Project Settings > API kopieren:
-   - Project URL
-   - anon/public key
-   - service_role key
+# ☁️ Deployment
 
-Der `service_role`-Key ist geheim und darf niemals in HTML, JavaScript oder GitHub gespeichert werden.
+Die Website wird vollständig über **Netlify** bereitgestellt.
 
-## 4. Netlify-Projekt mit GitHub verbinden
+Verwendete Dienste:
 
-1. Add new project > Import an existing project.
-2. GitHub-Repository auswählen.
-3. Build command: `npm run build`
-4. Publish directory: `.`
-5. Functions directory wird durch `netlify.toml` gesetzt.
+- Netlify Hosting
+- Netlify Functions
+- Netlify Identity
 
-## 5. Umgebungsvariablen in Netlify
+Als Datenbank dient:
 
-Unter Project configuration > Environment variables:
+- Supabase PostgreSQL
 
-- `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `SUPABASE_STORAGE_BUCKET` mit Wert `customer-files`
+Dateien werden gespeichert in:
 
-Danach einen neuen Deploy auslösen.
+- Supabase Storage
 
-## 6. Netlify Identity
+---
 
-1. Identity im Netlify-Projekt aktivieren.
-2. Registration auf `Invite only` setzen, wenn nur deine Kunden Konten bekommen sollen.
-3. Für Tests kannst du vorübergehend offene Registrierung verwenden.
-4. Deinen eigenen Benutzer anlegen und bestätigen.
-5. In der Benutzerverwaltung deinem Konto die Rolle `admin` geben.
-6. Abmelden und erneut anmelden, damit das neue Rollen-Token geladen wird.
+# 🔐 Sicherheit
 
-Neue normale Benutzer erhalten durch `netlify/functions/identity.mjs` automatisch die Rolle `customer`.
+- geschützte API-Endpunkte
+- JWT-Authentifizierung
+- private Dateispeicherung
+- Admin-Rollen
+- Kunden können ausschließlich ihre eigenen Dateien herunterladen
+- sichere Uploads über signierte URLs
 
-## 7. Decap CMS
+---
 
-`admin/config.yml` verwendet momentan `git-gateway`, weil das mit Netlify Identity am einfachsten einzurichten ist.
+# 🔍 SEO
 
-1. In Netlify Identity > Services Git Gateway aktivieren.
-2. `/admin/` öffnen.
-3. Mit deinem Admin-Konto anmelden.
-4. News-Beitrag erstellen und veröffentlichen.
-5. Decap schreibt die Markdown-Datei nach `content/news` ins GitHub-Repository.
-6. Netlify baut daraus automatisch `/news/` und einzelne News-Seiten.
+Die Website ist für Suchmaschinen optimiert.
 
-Hinweis: Git Gateway ist von Netlify als veraltet markiert. Für eine spätere langfristige Umstellung kann Decap mit einem GitHub-OAuth-Backend betrieben werden.
+Unter anderem:
 
-## 8. Funktionsprüfung
+- individuelle Seitentitel
+- Meta-Beschreibungen
+- robots.txt
+- sitemap.xml
+- Canonical URLs
+- saubere URL-Struktur
+- mobilfreundliches Design
 
-- `/` öffentliche Website
-- `/news/` News
-- `/konto/` Kundenkonto
-- `/backend/` Adminbackend
-- `/admin/` Decap CMS
+---
 
-Testablauf:
+# 📸 Leistungen
 
-1. Kundenkonto registrieren oder einladen.
-2. Als Kunde auf der Startseite eine Anfrage absenden.
-3. Als Admin im Backend Status und Nachricht ändern.
-4. Datei zu einer Bestellung hochladen.
-5. Als Kunde prüfen, ob Status und Download sichtbar sind.
+- Luftbilder
+- Luftvideos
+- Immobilien
+- Dächer
+- Solaranlagen
+- Landwirtschaft
+- Baustellen
+- Individuelle Projekte
 
-## 9. Subdomains
+---
 
-Empfohlen:
+# 🚀 Zukünftige Erweiterungen
 
-- Hauptseite: `deine-domain.ch`
-- Kundenkonto weiterhin: `deine-domain.ch/konto/`
-- Backend: `deine-domain.ch/backend/`
-- News: `deine-domain.ch/news/`
+- automatische E-Mail-Benachrichtigungen
+- Kalenderbuchung
+- Rechnungsverwaltung
+- Mehrsprachigkeit
+- Online-Bezahlung
+- Kundenbewertungen
 
-Separate Subdomains sind möglich, aber dafür sind meist getrennte Netlify-Projekte oder Proxy-Regeln nötig. Für SEO ist `/news/` in der Regel einfacher als `news.deine-domain.ch`.
+---
 
-## Sicherheit
+# 👨‍💻 Entwicklung
 
-- `SUPABASE_SERVICE_ROLE_KEY` niemals im Browser verwenden.
-- Der Storage-Bucket muss privat bleiben.
-- Kunden erhalten nur kurz gültige Downloadlinks.
-- Jede API-Funktion prüft Netlify Identity serverseitig.
-- `konto`, `backend` und `admin` werden über Header von Suchmaschinen ausgeschlossen.
+Dieses Projekt wurde individuell für ThurSky entwickelt und kontinuierlich erweitert.
+
+---
+
+# 📄 Lizenz
+
+Dieses Projekt ist ausschließlich für ThurSky bestimmt.
+
+Eine Weitergabe oder kommerzielle Nutzung ohne Zustimmung des Eigentümers ist nicht gestattet.
+
+---
+
+# 📞 Kontakt
+
+**ThurSky**
+
+🌍 https://dronenshots-kemmental.ch
+
+📷 Instagram  
+https://instagram.com/ThurSky.ch
+
+---
+
+© 2026 ThurSky – Alle Rechte vorbehalten.

@@ -1,18 +1,456 @@
 <!doctype html>
 <html lang="de">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin-Backend | ThurSky</title><meta name="description" content="Interner Verwaltungsbereich."><meta name="robots" content="noindex,nofollow">
-<link rel="stylesheet" href="/assets/css/style.css">
-<script defer src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-<script defer src="/assets/js/site.js"></script><script defer src="/assets/js/identity.js"></script><script defer src="/assets/js/content.js"></script><script defer src="/assets/js/api.js"></script><script defer src="/assets/js/admin.js"></script>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>Admin-Backend | ThurSky</title>
+
+  <meta
+    name="description"
+    content="Interner Verwaltungsbereich von ThurSky."
+  >
+
+  <meta
+    name="robots"
+    content="noindex,nofollow"
+  >
+
+  <link
+    rel="stylesheet"
+    href="/assets/css/style.css"
+  >
+
+  <!-- Nur für das Burger-Menü -->
+  <script
+    defer
+    src="/assets/js/site.js"
+  ></script>
 </head>
+
 <body>
-<header class="site-header"><div class="header-inner"><a class="brand" href="/"><img src="/assets/images/logo.png" data-fallback="/logo.png" alt="ThurSky Logo"><span class="brand-fallback">ThurSky</span></a><button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="main-nav" aria-label="Menü öffnen">☰</button><nav class="site-nav" id="main-nav" data-site-nav><a href="/">Start</a><a href="/ueber-mich/">Ich & Equipment</a><a href="/leistungen/">Leistungen</a><a href="/galerie/">Galerie</a><a href="/preise/">Preise</a><a href="/news/">News</a><a href="/bestellen/">Bestellen</a><a href="/kontakt/">Kontakt</a><div class="nav-separator"></div><a href="/konto/" data-auth-label>Kundenkonto</a><a class="hidden" data-admin-only href="/backend/">Admin-Backend</a><a class="hidden" data-admin-only href="/admin/">CMS</a><button class="hidden" data-logout type="button">Abmelden</button></nav></div></header>
-<section class="hero small"><div class="hero-content"><h1>Admin-Backend</h1><p>Bestellungen, Status und Kundendateien verwalten.</p></div></section>
-<main><section class="box" data-admin-gate><h2>Admin-Anmeldung erforderlich</h2><p>Dieser Bereich ist nur für Benutzer mit der Netlify-Identity-Rolle <code>admin</code> freigegeben.</p><button class="btn btn-primary" data-login type="button">Als Admin einloggen</button></section><section class="hidden" data-admin-app><div class="admin-layout"><aside class="box admin-sidebar"><h2>Verwaltung</h2><p>Bestellungen prüfen, Status ändern, Kundennachrichten schreiben und Dateien freigeben.</p><div class="btn-row"><a class="btn btn-accent btn-block" href="/admin/">Decap CMS öffnen</a><button class="btn btn-danger btn-block" data-logout type="button">Abmelden</button></div></aside><div><div class="grid grid-4" data-admin-stats></div><div data-admin-notice></div><div data-admin-orders></div></div></div></section></main>
-<footer class="site-footer"><div class="footer-inner"><div>ThurSky © 2026 · Drohnenaufnahmen im Thurgau</div><div class="footer-links"><a href="/kontakt/">Kontakt</a><a href="/impressum.html">Impressum</a><a href="https://instagram.com/ThurSky.ch" target="_blank" rel="noopener">Instagram</a></div></div></footer>
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-<script type="module" src="/assets/js/admin.js"></script>
+  <header class="site-header">
+    <div class="header-inner">
+      <a
+        class="brand"
+        href="/"
+        aria-label="ThurSky Startseite"
+      >
+        <img
+          src="/assets/images/logo.png"
+          data-fallback="/logo.png"
+          onerror="this.onerror=null;this.src='/logo.png'"
+          alt="ThurSky Logo"
+        >
+
+        <span class="brand-fallback">
+          ThurSky
+        </span>
+      </a>
+
+      <button
+        class="menu-toggle"
+        type="button"
+        data-menu-toggle
+        aria-expanded="false"
+        aria-controls="main-nav"
+        aria-label="Menü öffnen"
+      >
+        ☰
+      </button>
+
+      <nav
+        class="site-nav"
+        id="main-nav"
+        data-site-nav
+        aria-label="Hauptnavigation"
+      >
+        <a href="/">
+          Start
+        </a>
+
+        <a href="/ueber-mich/">
+          Ich &amp; Equipment
+        </a>
+
+        <a href="/leistungen/">
+          Leistungen
+        </a>
+
+        <a href="/galerie/">
+          Galerie
+        </a>
+
+        <a href="/preise/">
+          Preise
+        </a>
+
+        <a href="/news/">
+          News
+        </a>
+
+        <a href="/bestellen/">
+          Bestellen
+        </a>
+
+        <a href="/kontakt/">
+          Kontakt
+        </a>
+
+        <div class="nav-separator"></div>
+
+        <a href="/konto/">
+          Kundenkonto
+        </a>
+
+        <a
+          href="/backend/"
+          aria-current="page"
+        >
+          Admin-Backend
+        </a>
+
+        <a href="/admin/">
+          CMS
+        </a>
+
+        <button
+          id="logoutButton"
+          type="button"
+        >
+          Abmelden
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero small">
+    <div class="hero-content">
+      <h1>Admin-Backend</h1>
+
+      <p>
+        Bestellungen, Status, Kunden und Dateien verwalten.
+      </p>
+    </div>
+  </section>
+
+  <main>
+    <!-- Globale Meldungen -->
+    <div
+      id="adminMessage"
+      aria-live="polite"
+    ></div>
+
+    <!-- Admin-Information und Navigation -->
+    <section class="box">
+      <div class="section-title">
+        <h2>Verwaltung</h2>
+
+        <p id="adminIdentity">
+          Admin-Anmeldung wird geprüft …
+        </p>
+      </div>
+
+      <div class="btn-row">
+        <button
+          class="btn btn-primary active"
+          type="button"
+          data-view="orders"
+        >
+          Bestellungen
+        </button>
+
+        <button
+          class="btn btn-secondary"
+          type="button"
+          data-view="customers"
+        >
+          Kunden
+        </button>
+
+        <button
+          class="btn btn-secondary"
+          type="button"
+          data-view="new-order"
+        >
+          Bestellung erstellen
+        </button>
+
+        <a
+          class="btn btn-accent"
+          href="/admin/"
+        >
+          Decap CMS öffnen
+        </a>
+      </div>
+    </section>
+
+    <!-- =====================================================
+         BESTELLUNGEN
+    ====================================================== -->
+
+    <section
+      class="admin-view"
+      id="view-orders"
+    >
+      <section class="box">
+        <div class="section-title">
+          <h2>Bestellungen</h2>
+
+          <p>
+            Bestellungen laden, bearbeiten und Kundendateien
+            hochladen.
+          </p>
+        </div>
+
+        <div class="btn-row">
+          <button
+            class="btn btn-secondary"
+            id="refreshOrders"
+            type="button"
+          >
+            Bestellungen aktualisieren
+          </button>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Bestellnummer</th>
+                <th>Kunde</th>
+                <th>Leistung</th>
+                <th>Status</th>
+                <th>Aktion</th>
+              </tr>
+            </thead>
+
+            <tbody id="ordersTable">
+              <tr>
+                <td colspan="5">
+                  Bestellungen werden geladen …
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Hier erscheint das Bearbeitungsformular -->
+      <div id="orderEditor"></div>
+    </section>
+
+    <!-- =====================================================
+         KUNDEN
+    ====================================================== -->
+
+    <section
+      class="admin-view hidden"
+      id="view-customers"
+    >
+      <section class="box">
+        <div class="section-title">
+          <h2>Kundenkonten</h2>
+
+          <p>
+            Übersicht der Benutzer aus Netlify Identity.
+          </p>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>E-Mail</th>
+                <th>Benutzer-ID</th>
+                <th>Rollen</th>
+              </tr>
+            </thead>
+
+            <tbody id="customersTable">
+              <tr>
+                <td colspan="3">
+                  Kunden werden geladen …
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <!-- =====================================================
+         NEUE BESTELLUNG
+    ====================================================== -->
+
+    <section
+      class="admin-view hidden"
+      id="view-new-order"
+    >
+      <section class="box">
+        <div class="section-title">
+          <h2>Neue Bestellung erstellen</h2>
+
+          <p>
+            Eine Bestellung manuell einem Kundenkonto zuordnen.
+          </p>
+        </div>
+
+        <form id="newOrderForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="newCustomer">
+                Kunde *
+              </label>
+
+              <select
+                id="newCustomer"
+                required
+              >
+                <option value="">
+                  Kunden werden geladen …
+                </option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="newPackage">
+                Leistung oder Paket *
+              </label>
+
+              <input
+                id="newPackage"
+                type="text"
+                required
+                placeholder="Zum Beispiel: 10 Luftbilder"
+              >
+            </div>
+
+            <div class="field">
+              <label for="newStatus">
+                Status
+              </label>
+
+              <select id="newStatus">
+                <option value="received">
+                  Anfrage eingegangen
+                </option>
+
+                <option value="planning">
+                  Termin wird geplant
+                </option>
+
+                <option value="confirmed">
+                  Termin bestätigt
+                </option>
+
+                <option value="captured">
+                  Aufnahmen erstellt
+                </option>
+
+                <option value="processing">
+                  In Bearbeitung
+                </option>
+
+                <option value="ready">
+                  Bereit zum Download
+                </option>
+
+                <option value="completed">
+                  Abgeschlossen
+                </option>
+
+                <option value="cancelled">
+                  Storniert
+                </option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="newDesiredDate">
+                Wunschdatum
+              </label>
+
+              <input
+                id="newDesiredDate"
+                type="date"
+              >
+            </div>
+
+            <div class="field field-full">
+              <label for="newAdminMessage">
+                Nachricht an den Kunden
+              </label>
+
+              <textarea
+                id="newAdminMessage"
+                rows="5"
+                placeholder="Optionale Nachricht"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button
+              class="btn btn-primary"
+              type="submit"
+            >
+              Bestellung erstellen
+            </button>
+          </div>
+        </form>
+      </section>
+    </section>
+
+    <div class="back-row">
+      <a
+        class="btn btn-secondary"
+        href="/"
+      >
+        Zurück zur Website
+      </a>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>
+        ThurSky © 2026 · Drohnenaufnahmen im Thurgau
+      </div>
+
+      <div class="footer-links">
+        <a href="/kontakt/">
+          Kontakt
+        </a>
+
+        <a href="/impressum.html">
+          Impressum
+        </a>
+
+        <a
+          href="https://instagram.com/ThurSky.ch"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Instagram
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Netlify Identity muss vor admin.js geladen werden -->
+  <script
+    src="https://identity.netlify.com/v1/netlify-identity-widget.js"
+  ></script>
+
+  <!-- admin.js verwendet JavaScript-Imports -->
+  <script
+    type="module"
+    src="/assets/js/admin.js"
+  ></script>
 </body>
 </html>

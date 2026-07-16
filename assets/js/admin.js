@@ -1,30 +1,28 @@
-import {
-  createClient
-} from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
-import {
-  api,
-  escapeHtml
-} from "./api.js";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+import { api, escapeHtml } from "./api.js";
 
 const identity = window.netlifyIdentity;
 
 let users = [];
 let orders = [];
-let adminStarted = false;
+let backendLoaded = false;
 
 /* =========================================================
-   INITIALISIERUNG
+   START
 ========================================================= */
 
 if (!identity) {
-  showFatalAdminError(
-    "Netlify Identity konnte nicht geladen werden. Bitte lade die Seite neu."
-  );
+  document.body.innerHTML = `
+    <main style="max-width:700px;margin:50px auto;padding:20px">
+      <section class="box">
+        <h1>Admin-Backend</h1>
+        <p>Netlify Identity konnte nicht geladen werden.</p>
+        <a href="/">Zur Startseite</a>
+      </section>
+    </main>
+  `;
 
-  throw new Error(
-    "Netlify Identity ist nicht verfügbar."
-  );
+  throw new Error("Netlify Identity wurde nicht geladen.");
 }
 
 identity.on("init", async (user) => {
@@ -33,6 +31,7 @@ identity.on("init", async (user) => {
 
 identity.on("login", async (user) => {
   identity.close();
+  backendLoaded = false;
   await handleUser(user);
 });
 
@@ -41,53 +40,42 @@ identity.on("logout", () => {
 });
 
 identity.on("error", (error) => {
-  console.error(
-    "Netlify-Identity-Fehler:",
-    error
-  );
-
-  showAdminLoginMessage(
-    "Bei der Anmeldung ist ein Fehler aufgetreten. Bitte melde dich erneut an."
+  console.error("Netlify-Identity-Fehler:", error);
+  showMessage(
+    "Bei der Anmeldung ist ein Fehler aufgetreten.",
+    true
   );
 });
 
 identity.init();
 
-document
-  .querySelector("#logoutButton")
-  ?.addEventListener(
-    "click",
-    async () => {
-      await identity.logout();
-    }
-  );
+/* =========================================================
+   FESTE BUTTONS VERBINDEN
+========================================================= */
 
 document
-  .querySelectorAll("[data-view]")
-  .forEach((button) => {
-    button.addEventListener(
-      "click",
-      () => {
-        switchView(
-          button.dataset.view
-        );
-      }
-    );
+  .querySelector("#logoutButton")
+  ?.addEventListener("click", async () => {
+    await identity.logout();
   });
 
 document
   .querySelector("#refreshOrders")
-  ?.addEventListener(
-    "click",
-    loadOrders
-  );
+  ?.addEventListener("click", async () => {
+    await loadOrders();
+  });
 
 document
   .querySelector("#newOrderForm")
-  ?.addEventListener(
-    "submit",
-    createOrder
-  );
+  ?.addEventListener("submit", createOrder);
+
+document
+  .querySelectorAll("[data-view]")
+  .forEach((button) => {
+    button.addEventListener("click", () => {
+      switchView(button.dataset.view);
+    });
+  });
 
 /* =========================================================
    ADMIN PRÜFEN
@@ -96,568 +84,301 @@ document
 async function handleUser(user) {
   try {
     if (!user) {
-      adminStarted = false;
-
-      showAdminLoginMessage(
-        "Bitte melde dich mit deinem Admin-Konto an."
+      setAdminIdentity(
+        "Bitte mit dem Admin-Konto anmelden."
       );
 
       identity.open("login");
       return;
     }
 
-    let token = null;
+    let token = "";
 
-    /*
-     * Token erneuern, damit eine neu gesetzte Admin-Rolle
-     * sicher im aktuellen JWT enthalten ist.
-     */
     try {
       token = await user.jwt(true);
     } catch (refreshError) {
       console.warn(
-        "JWT konnte nicht erzwungen erneuert werden:",
+        "Token konnte nicht erzwungen erneuert werden:",
         refreshError
       );
 
-      try {
-        token = await user.jwt();
-      } catch (tokenError) {
-        console.error(
-          "JWT konnte nicht geladen werden:",
-          tokenError
-        );
-      }
+      token = await user.jwt();
     }
 
-    const roles =
-      collectUserRoles(
-        user,
-        token
-      );
+    const roles = getRoles(user, token);
 
-    console.log(
-      "Angemeldeter Benutzer:",
-      user.email
-    );
-
-    console.log(
-      "Erkannte Rollen:",
-      roles
-    );
+    console.log("Angemeldeter Benutzer:", user.email);
+    console.log("Erkannte Rollen:", roles);
 
     if (!roles.includes("admin")) {
-      adminStarted = false;
+      setAdminIdentity(
+        `Angemeldet als ${user.email}, aber ohne aktuelle Admin-Rolle.`
+      );
 
-      showAdminLoginMessage(
-        `Du bist als ${user.email || "Benutzer"} angemeldet, ` +
-        "aber dein aktuelles Login-Token enthält keine Admin-Rolle. " +
-        "Bitte melde dich vollständig ab und danach erneut an."
+      showMessage(
+        "Dein aktuelles Login-Token enthält die Rolle admin nicht. Bitte vollständig abmelden und erneut anmelden.",
+        true
       );
 
       return;
     }
 
-    const adminIdentity =
-      document.querySelector(
-        "#adminIdentity"
-      );
+    setAdminIdentity(`Admin: ${user.email}`);
 
-    if (adminIdentity) {
-      adminIdentity.textContent =
-        `Admin: ${user.email}`;
-    }
-
-    hideAdminLoginMessage();
-
-    /*
-     * Verhindert doppeltes Laden durch init und login.
-     */
-    if (adminStarted) {
+    if (backendLoaded) {
       return;
     }
 
-    adminStarted = true;
+    backendLoaded = true;
 
-    const results =
-      await Promise.allSettled([
-        loadUsers(),
-        loadOrders()
-      ]);
-
-    results.forEach(
-      (result, index) => {
-        if (
-          result.status === "rejected"
-        ) {
-          console.error(
-            index === 0
-              ? "Benutzer konnten nicht geladen werden:"
-              : "Bestellungen konnten nicht geladen werden:",
-            result.reason
-          );
-        }
-      }
-    );
+    await Promise.all([
+      loadUsers(),
+      loadOrders()
+    ]);
   } catch (error) {
-    adminStarted = false;
+    backendLoaded = false;
 
     console.error(
-      "Fehler bei der Admin-Prüfung:",
+      "Fehler beim Start des Adminbackends:",
       error
     );
 
-    showAdminLoginMessage(
-      error?.message ||
-      "Die Admin-Berechtigung konnte nicht geprüft werden."
+    setAdminIdentity(
+      "Die Admin-Anmeldung konnte nicht geprüft werden."
+    );
+
+    showMessage(
+      error.message ||
+        "Das Adminbackend konnte nicht geladen werden.",
+      true
     );
   }
 }
 
-/* =========================================================
-   ROLLEN AUS BENUTZER UND JWT LESEN
-========================================================= */
-
-function collectUserRoles(
-  user,
-  token
-) {
-  const roles = new Set();
+function getRoles(user, token) {
+  const roleSet = new Set();
 
   function addRoles(value) {
     if (Array.isArray(value)) {
       value.forEach((role) => {
-        const normalizedRole =
-          String(role || "")
-            .trim()
-            .toLowerCase();
+        const normalized = String(role || "")
+          .trim()
+          .toLowerCase();
 
-        if (normalizedRole) {
-          roles.add(
-            normalizedRole
-          );
+        if (normalized) {
+          roleSet.add(normalized);
         }
       });
 
       return;
     }
 
-    if (
-      typeof value === "string"
-    ) {
+    if (typeof value === "string") {
       value
         .split(",")
-        .map((role) =>
-          role
-            .trim()
-            .toLowerCase()
-        )
+        .map((role) => role.trim().toLowerCase())
         .filter(Boolean)
-        .forEach((role) => {
-          roles.add(role);
-        });
+        .forEach((role) => roleSet.add(role));
     }
   }
 
-  /*
-   * Rollen aus dem Netlify-Benutzerobjekt.
-   */
-  addRoles(
-    user?.app_metadata?.roles
-  );
+  addRoles(user.app_metadata?.roles);
+  addRoles(user.appMetadata?.roles);
+  addRoles(user.roles);
 
-  addRoles(
-    user?.appMetadata?.roles
-  );
+  const claims = decodeJwt(token);
 
-  addRoles(
-    user?.roles
-  );
+  addRoles(claims.app_metadata?.roles);
+  addRoles(claims.appMetadata?.roles);
+  addRoles(claims.roles);
 
-  addRoles(
-    user?.user?.app_metadata?.roles
-  );
-
-  /*
-   * Rollen zusätzlich direkt aus dem JWT lesen.
-   */
-  const claims =
-    decodeJwtPayload(token);
-
-  addRoles(
-    claims?.app_metadata?.roles
-  );
-
-  addRoles(
-    claims?.appMetadata?.roles
-  );
-
-  addRoles(
-    claims?.roles
-  );
-
-  addRoles(
-    claims?.user?.app_metadata?.roles
-  );
-
-  return Array.from(roles);
+  return Array.from(roleSet);
 }
 
-function decodeJwtPayload(token) {
-  if (
-    !token ||
-    typeof token !== "string"
-  ) {
+function decodeJwt(token) {
+  if (!token || typeof token !== "string") {
     return {};
   }
 
   try {
-    const parts =
-      token.split(".");
+    const parts = token.split(".");
 
     if (parts.length < 2) {
       return {};
     }
 
-    const base64Url =
-      parts[1];
-
-    const base64 =
-      base64Url
-        .replace(/-/g, "+")
-        .replace(/_/g, "/");
+    const base64 = parts[1]
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
 
     const padding =
-      "=".repeat(
-        (4 - base64.length % 4) % 4
-      );
+      "=".repeat((4 - (base64.length % 4)) % 4);
 
-    const binary =
-      window.atob(
-        base64 + padding
-      );
+    const decoded = window.atob(base64 + padding);
 
-    const bytes =
-      Uint8Array.from(
-        binary,
-        (character) =>
-          character.charCodeAt(0)
-      );
+    const bytes = Uint8Array.from(
+      decoded,
+      (character) => character.charCodeAt(0)
+    );
 
-    const json =
-      new TextDecoder()
-        .decode(bytes);
+    const json = new TextDecoder().decode(bytes);
 
     return JSON.parse(json);
   } catch (error) {
-    console.warn(
-      "JWT konnte nicht gelesen werden:",
-      error
-    );
-
+    console.warn("JWT konnte nicht gelesen werden:", error);
     return {};
   }
 }
 
-/* =========================================================
-   ADMIN-LOGIN-MELDUNG
-========================================================= */
+function setAdminIdentity(text) {
+  const element =
+    document.querySelector("#adminIdentity");
 
-function showAdminLoginMessage(
-  message
-) {
-  let box =
-    document.querySelector(
-      "#adminAccessMessage"
-    );
-
-  if (!box) {
-    box =
-      document.createElement(
-        "div"
-      );
-
-    box.id =
-      "adminAccessMessage";
-
-    box.className =
-      "notice notice-error";
-
-    box.style.maxWidth =
-      "850px";
-
-    box.style.margin =
-      "24px auto";
-
-    box.style.padding =
-      "18px";
-
-    const main =
-      document.querySelector(
-        "main"
-      );
-
-    if (main) {
-      main.prepend(box);
-    } else {
-      document.body
-        .appendChild(box);
-    }
+  if (element) {
+    element.textContent = text;
   }
-
-  box.innerHTML = `
-    <strong>
-      Admin-Anmeldung erforderlich
-    </strong>
-
-    <p style="margin-bottom:12px">
-      ${escapeHtml(message)}
-    </p>
-
-    <div
-      style="
-        display:flex;
-        gap:10px;
-        flex-wrap:wrap;
-      "
-    >
-      <button
-        class="btn btn-primary"
-        id="openAdminLogin"
-        type="button"
-      >
-        Als Admin anmelden
-      </button>
-
-      <button
-        class="btn btn-secondary"
-        id="adminLogoutAndLogin"
-        type="button"
-      >
-        Abmelden und neu anmelden
-      </button>
-    </div>
-  `;
-
-  document
-    .querySelector(
-      "#openAdminLogin"
-    )
-    ?.addEventListener(
-      "click",
-      () => {
-        identity.open("login");
-      }
-    );
-
-  document
-    .querySelector(
-      "#adminLogoutAndLogin"
-    )
-    ?.addEventListener(
-      "click",
-      async () => {
-        try {
-          await identity.logout();
-        } finally {
-          window.setTimeout(
-            () => {
-              identity.open(
-                "login"
-              );
-            },
-            500
-          );
-        }
-      }
-    );
-}
-
-function hideAdminLoginMessage() {
-  document
-    .querySelector(
-      "#adminAccessMessage"
-    )
-    ?.remove();
-}
-
-function showFatalAdminError(
-  message
-) {
-  document.body.innerHTML = `
-    <main
-      style="
-        width:min(700px,calc(100% - 32px));
-        margin:50px auto;
-        font-family:Arial,sans-serif;
-      "
-    >
-      <section
-        style="
-          padding:24px;
-          border-radius:18px;
-          background:white;
-          box-shadow:0 12px 28px rgba(0,0,0,.14);
-        "
-      >
-        <h1>
-          Admin-Backend
-        </h1>
-
-        <p>
-          ${escapeHtml(message)}
-        </p>
-
-        <a href="/">
-          Zur Startseite
-        </a>
-      </section>
-    </main>
-  `;
 }
 
 /* =========================================================
-   ANSICHTEN
+   ANSICHTEN UMSCHALTEN
 ========================================================= */
 
 function switchView(name) {
   document
-    .querySelectorAll(
-      ".admin-view"
-    )
+    .querySelectorAll(".admin-view")
     .forEach((view) => {
-      view.classList.add(
-        "hidden"
-      );
+      view.classList.add("hidden");
     });
 
   const target =
-    document.querySelector(
-      `#view-${name}`
-    );
+    document.querySelector(`#view-${name}`);
 
   if (target) {
-    target.classList.remove(
-      "hidden"
-    );
+    target.classList.remove("hidden");
   }
 
   document
-    .querySelectorAll(
-      "[data-view]"
-    )
+    .querySelectorAll("[data-view]")
     .forEach((button) => {
+      const isActive =
+        button.dataset.view === name;
+
       button.classList.toggle(
         "active",
-        button.dataset.view === name
+        isActive
       );
     });
 }
 
 /* =========================================================
-   BENUTZER LADEN
+   KUNDEN LADEN
 ========================================================= */
 
 async function loadUsers() {
   try {
-    const result =
-      await api(
-        "admin-users"
-      );
+    const result = await api("admin-users");
 
-    users =
-      Array.isArray(
-        result?.users
-      )
-        ? result.users
-        : [];
+    users = Array.isArray(result?.users)
+      ? result.users
+      : [];
 
-    const table =
-      document.querySelector(
-        "#customersTable"
-      );
-
-    if (table) {
-      table.innerHTML =
-        users.length > 0
-          ? users
-              .map(
-                (user) => `
-                  <tr>
-                    <td>
-                      ${escapeHtml(
-                        user.email
-                      )}
-                    </td>
-
-                    <td>
-                      <code>
-                        ${escapeHtml(
-                          user.id
-                        )}
-                      </code>
-                    </td>
-
-                    <td>
-                      ${escapeHtml(
-                        (
-                          user.roles ||
-                          []
-                        ).join(", ")
-                      )}
-                    </td>
-                  </tr>
-                `
-              )
-              .join("")
-          : `
-              <tr>
-                <td colspan="3">
-                  Keine Benutzer gefunden.
-                </td>
-              </tr>
-            `;
-    }
-
-    const select =
-      document.querySelector(
-        "#newCustomer"
-      );
-
-    if (select) {
-      select.innerHTML = `
-        <option value="">
-          Bitte wählen
-        </option>
-
-        ${users
-          .map(
-            (user) => `
-              <option
-                value="${escapeHtml(
-                  user.id
-                )}"
-                data-email="${escapeHtml(
-                  user.email
-                )}"
-              >
-                ${escapeHtml(
-                  user.email
-                )}
-              </option>
-            `
-          )
-          .join("")}
-      `;
-    }
+    renderUsers();
+    renderCustomerSelect();
   } catch (error) {
-    showMessage(
-      error.message,
-      true
+    console.error(
+      "Kunden konnten nicht geladen werden:",
+      error
     );
 
-    throw error;
+    const table =
+      document.querySelector("#customersTable");
+
+    if (table) {
+      table.innerHTML = `
+        <tr>
+          <td colspan="3">
+            Fehler: ${escapeHtml(error.message)}
+          </td>
+        </tr>
+      `;
+    }
+
+    showMessage(
+      `Kunden konnten nicht geladen werden: ${error.message}`,
+      true
+    );
   }
+}
+
+function renderUsers() {
+  const table =
+    document.querySelector("#customersTable");
+
+  if (!table) {
+    return;
+  }
+
+  if (users.length === 0) {
+    table.innerHTML = `
+      <tr>
+        <td colspan="3">
+          Keine Benutzer gefunden.
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  table.innerHTML = users
+    .map((user) => {
+      return `
+        <tr>
+          <td>${escapeHtml(user.email || "")}</td>
+
+          <td>
+            <code>${escapeHtml(user.id || "")}</code>
+          </td>
+
+          <td>
+            ${escapeHtml(
+              Array.isArray(user.roles)
+                ? user.roles.join(", ")
+                : ""
+            )}
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+}
+
+function renderCustomerSelect() {
+  const select =
+    document.querySelector("#newCustomer");
+
+  if (!select) {
+    return;
+  }
+
+  select.innerHTML = `
+    <option value="">
+      Bitte wählen
+    </option>
+
+    ${users
+      .map((user) => {
+        return `
+          <option
+            value="${escapeHtml(user.id || "")}"
+            data-email="${escapeHtml(user.email || "")}"
+          >
+            ${escapeHtml(user.email || "")}
+          </option>
+        `;
+      })
+      .join("")}
+  `;
 }
 
 /* =========================================================
@@ -665,122 +386,133 @@ async function loadUsers() {
 ========================================================= */
 
 async function loadOrders() {
+  const table =
+    document.querySelector("#ordersTable");
+
+  if (table) {
+    table.innerHTML = `
+      <tr>
+        <td colspan="5">
+          Bestellungen werden geladen …
+        </td>
+      </tr>
+    `;
+  }
+
   try {
     const result =
-      await api(
-        "orders?scope=all"
-      );
+      await api("orders?scope=all");
 
-    orders =
-      Array.isArray(
-        result?.orders
-      )
-        ? result.orders
-        : [];
+    orders = Array.isArray(result?.orders)
+      ? result.orders
+      : [];
 
-    const table =
-      document.querySelector(
-        "#ordersTable"
-      );
-
-    if (!table) {
-      return;
-    }
-
-    table.innerHTML =
-      orders.length > 0
-        ? orders
-            .map(
-              (order) => `
-                <tr>
-                  <td>
-                    ${escapeHtml(
-                      order.order_number
-                    )}
-                  </td>
-
-                  <td>
-                    ${escapeHtml(
-                      order.customer_email
-                    )}
-                  </td>
-
-                  <td>
-                    ${escapeHtml(
-                      order.package_name
-                    )}
-                  </td>
-
-                  <td>
-                    ${escapeHtml(
-                      order.status_label ||
-                      order.status
-                    )}
-                  </td>
-
-                  <td>
-                    <button
-                      class="btn btn-secondary btn-small"
-                      type="button"
-                      data-edit="${escapeHtml(
-                        order.id
-                      )}"
-                    >
-                      Bearbeiten
-                    </button>
-                  </td>
-                </tr>
-              `
-            )
-            .join("")
-        : `
-            <tr>
-              <td colspan="5">
-                Keine Bestellungen vorhanden.
-              </td>
-            </tr>
-          `;
-
-    document
-      .querySelectorAll(
-        "[data-edit]"
-      )
-      .forEach((button) => {
-        button.addEventListener(
-          "click",
-          () => {
-            editOrder(
-              button.dataset.edit
-            );
-          }
-        );
-      });
+    renderOrders();
   } catch (error) {
-    showMessage(
-      error.message,
-      true
+    console.error(
+      "Bestellungen konnten nicht geladen werden:",
+      error
     );
 
-    throw error;
+    if (table) {
+      table.innerHTML = `
+        <tr>
+          <td colspan="5">
+            Fehler: ${escapeHtml(error.message)}
+          </td>
+        </tr>
+      `;
+    }
+
+    showMessage(
+      `Bestellungen konnten nicht geladen werden: ${error.message}`,
+      true
+    );
   }
 }
 
+function renderOrders() {
+  const table =
+    document.querySelector("#ordersTable");
+
+  if (!table) {
+    return;
+  }
+
+  if (orders.length === 0) {
+    table.innerHTML = `
+      <tr>
+        <td colspan="5">
+          Keine Bestellungen vorhanden.
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  table.innerHTML = orders
+    .map((order) => {
+      return `
+        <tr>
+          <td>
+            ${escapeHtml(order.order_number || "")}
+          </td>
+
+          <td>
+            ${escapeHtml(order.customer_email || "")}
+          </td>
+
+          <td>
+            ${escapeHtml(order.package_name || "")}
+          </td>
+
+          <td>
+            ${escapeHtml(
+              order.status_label ||
+              order.status ||
+              ""
+            )}
+          </td>
+
+          <td>
+            <button
+              class="btn btn-secondary btn-small"
+              type="button"
+              data-edit-order="${escapeHtml(order.id || "")}"
+            >
+              Bearbeiten
+            </button>
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  document
+    .querySelectorAll("[data-edit-order]")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        editOrder(button.dataset.editOrder);
+      });
+    });
+}
+
 /* =========================================================
-   BESTELLUNG ERSTELLEN
+   NEUE BESTELLUNG
 ========================================================= */
 
 async function createOrder(event) {
   event.preventDefault();
 
   const select =
-    document.querySelector(
-      "#newCustomer"
-    );
+    document.querySelector("#newCustomer");
 
-  const option =
-    select
-      ?.selectedOptions
-      ?.[0];
+  const selectedOption =
+    select?.selectedOptions?.[0];
+
+  const packageInput =
+    document.querySelector("#newPackage");
 
   if (!select?.value) {
     showMessage(
@@ -791,72 +523,55 @@ async function createOrder(event) {
     return;
   }
 
-  try {
-    await api(
-      "orders",
-      {
-        method: "POST",
-
-        body: JSON.stringify({
-          customer_id:
-            select.value,
-
-          customer_email:
-            option
-              ?.dataset
-              ?.email || "",
-
-          package_name:
-            document
-              .querySelector(
-                "#newPackage"
-              )
-              ?.value
-              .trim() || "",
-
-          status:
-            document
-              .querySelector(
-                "#newStatus"
-              )
-              ?.value ||
-            "received",
-
-          desired_date:
-            document
-              .querySelector(
-                "#newDesiredDate"
-              )
-              ?.value ||
-            null,
-
-          admin_message:
-            document
-              .querySelector(
-                "#newAdminMessage"
-              )
-              ?.value
-              .trim() || ""
-        })
-      }
+  if (!packageInput?.value.trim()) {
+    showMessage(
+      "Bitte eine Leistung oder ein Paket eingeben.",
+      true
     );
 
-    event
-      .currentTarget
-      .reset();
+    return;
+  }
+
+  try {
+    await api("orders", {
+      method: "POST",
+
+      body: JSON.stringify({
+        customer_id: select.value,
+
+        customer_email:
+          selectedOption?.dataset?.email || "",
+
+        package_name:
+          packageInput.value.trim(),
+
+        status:
+          document.querySelector("#newStatus")?.value ||
+          "received",
+
+        desired_date:
+          document.querySelector("#newDesiredDate")?.value ||
+          null,
+
+        admin_message:
+          document
+            .querySelector("#newAdminMessage")
+            ?.value.trim() || ""
+      })
+    });
+
+    event.currentTarget.reset();
 
     showMessage(
-      "Bestellung wurde erstellt."
+      "Bestellung wurde erfolgreich erstellt."
     );
 
     await loadOrders();
 
-    switchView(
-      "orders"
-    );
+    switchView("orders");
   } catch (error) {
     showMessage(
-      error.message,
+      `Bestellung konnte nicht erstellt werden: ${error.message}`,
       true
     );
   }
@@ -868,10 +583,7 @@ async function createOrder(event) {
 
 function editOrder(id) {
   const order =
-    orders.find(
-      (item) =>
-        item.id === id
-    );
+    orders.find((item) => item.id === id);
 
   if (!order) {
     showMessage(
@@ -883,145 +595,115 @@ function editOrder(id) {
   }
 
   const editor =
-    document.querySelector(
-      "#orderEditor"
-    );
+    document.querySelector("#orderEditor");
 
   if (!editor) {
     return;
   }
 
   editor.innerHTML = `
-    <form
-      class="card section"
-      id="editOrderForm"
-    >
-      <h2>
-        ${escapeHtml(
-          order.order_number
-        )}
-        bearbeiten
-      </h2>
+    <section class="box">
+      <form id="editOrderForm">
+        <h2>
+          ${escapeHtml(order.order_number || "")}
+          bearbeiten
+        </h2>
 
-      <div class="form-grid">
-        <div class="field">
-          <label for="editStatus">
-            Status
-          </label>
+        <div class="form-grid">
+          <div class="field">
+            <label for="editStatus">
+              Status
+            </label>
 
-          <select id="editStatus">
-            ${statusOptions(
-              order.status
-            )}
-          </select>
+            <select id="editStatus">
+              ${statusOptions(order.status)}
+            </select>
+          </div>
+
+          <div class="field field-full">
+            <label for="editAdminMessage">
+              Nachricht an Kunden
+            </label>
+
+            <textarea
+              id="editAdminMessage"
+              rows="5"
+            >${escapeHtml(order.admin_message || "")}</textarea>
+          </div>
+
+          <div class="field field-full">
+            <label for="fileInput">
+              Bilder oder Dateien hochladen
+            </label>
+
+            <input
+              id="fileInput"
+              type="file"
+              accept="image/*,video/*,.pdf,.zip"
+              multiple
+            >
+
+            <small>
+              Mehrere Dateien können gleichzeitig ausgewählt
+              und nacheinander hochgeladen werden.
+            </small>
+          </div>
         </div>
 
-        <div class="field field-full">
-          <label for="editAdminMessage">
-            Nachricht an Kunden
-          </label>
-
-          <textarea
-            id="editAdminMessage"
-            rows="5"
-          >${escapeHtml(
-            order.admin_message ||
-            ""
-          )}</textarea>
-        </div>
-
-        <div class="field field-full">
-          <label for="fileInput">
-            Bilder oder Dateien hochladen
-          </label>
-
-          <input
-            id="fileInput"
-            type="file"
-            accept="image/*,video/*,.zip,.pdf"
-            multiple
+        <div class="btn-row">
+          <button
+            class="btn btn-primary"
+            type="submit"
           >
+            Status und Nachricht speichern
+          </button>
 
-          <small>
-            Du kannst mehrere Dateien gleichzeitig auswählen.
-            Die Dateien werden nacheinander in den privaten
-            Supabase-Speicher hochgeladen.
-          </small>
+          <button
+            class="btn btn-secondary"
+            id="uploadFileButton"
+            type="button"
+          >
+            Dateien hochladen
+          </button>
         </div>
-      </div>
 
-      <div
-        style="
-          display:flex;
-          gap:10px;
-          flex-wrap:wrap;
-        "
-      >
-        <button
-          class="btn btn-primary"
-          type="submit"
-        >
-          Speichern
-        </button>
-
-        <button
-          class="btn btn-secondary"
-          type="button"
-          id="uploadFileButton"
-        >
-          Dateien hochladen
-        </button>
-      </div>
-
-      <div id="editResult"></div>
-    </form>
+        <div id="editResult"></div>
+      </form>
+    </section>
   `;
 
   document
-    .querySelector(
-      "#editOrderForm"
-    )
+    .querySelector("#editOrderForm")
     ?.addEventListener(
       "submit",
       async (event) => {
         event.preventDefault();
 
         try {
-          await api(
-            "orders",
-            {
-              method: "PATCH",
+          await api("orders", {
+            method: "PATCH",
 
-              body:
-                JSON.stringify({
-                  id,
+            body: JSON.stringify({
+              id: order.id,
 
-                  status:
-                    document
-                      .querySelector(
-                        "#editStatus"
-                      )
-                      ?.value,
+              status:
+                document.querySelector("#editStatus")?.value,
 
-                  admin_message:
-                    document
-                      .querySelector(
-                        "#editAdminMessage"
-                      )
-                      ?.value
-                      .trim() ||
-                    ""
-                })
-            }
-          );
+              admin_message:
+                document
+                  .querySelector("#editAdminMessage")
+                  ?.value.trim() || ""
+            })
+          });
 
-          showMessage(
-            "Bestellung wurde aktualisiert."
+          showEditResult(
+            "Bestellung wurde aktualisiert.",
+            false
           );
 
           await loadOrders();
         } catch (error) {
-          showMessage(
+          showEditResult(
             error.message,
             true
           );
@@ -1030,80 +712,52 @@ function editOrder(id) {
     );
 
   document
-    .querySelector(
-      "#uploadFileButton"
-    )
+    .querySelector("#uploadFileButton")
     ?.addEventListener(
       "click",
-      () => {
-        uploadFiles(order);
+      async () => {
+        await uploadFiles(order);
       }
     );
+
+  editor.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
 }
 
 /* =========================================================
-   MEHRERE DATEIEN HOCHLADEN
+   MEHRFACH-UPLOAD
 ========================================================= */
 
 async function uploadFiles(order) {
   const input =
-    document.querySelector(
-      "#fileInput"
-    );
+    document.querySelector("#fileInput");
 
-  const result =
-    document.querySelector(
-      "#editResult"
-    );
-
-  const uploadButton =
-    document.querySelector(
-      "#uploadFileButton"
-    );
+  const button =
+    document.querySelector("#uploadFileButton");
 
   const files =
-    Array.from(
-      input?.files ||
-      []
-    );
+    Array.from(input?.files || []);
 
   if (files.length === 0) {
-    alert(
-      "Bitte mindestens eine Datei auswählen."
+    showEditResult(
+      "Bitte mindestens eine Datei auswählen.",
+      true
     );
 
     return;
   }
 
-  if (!order?.id) {
-    if (result) {
-      result.innerHTML = `
-        <div class="notice notice-error">
-          Die Bestell-ID fehlt.
-        </div>
-      `;
-    }
+  button.disabled = true;
+  button.textContent = "Upload läuft …";
 
-    return;
-  }
-
-  if (uploadButton) {
-    uploadButton.disabled =
-      true;
-
-    uploadButton.textContent =
-      "Upload läuft …";
-  }
-
-  let successfulUploads = 0;
-
-  const failedUploads = [];
+  let successful = 0;
+  const failed = [];
 
   try {
     const config =
-      await api(
-        "public-config"
-      );
+      await api("public-config");
 
     if (
       !config?.supabase_url ||
@@ -1111,122 +765,61 @@ async function uploadFiles(order) {
       !config?.bucket
     ) {
       throw new Error(
-        "Die öffentliche Supabase-Konfiguration ist unvollständig."
+        "Die Supabase-Konfiguration ist unvollständig."
       );
     }
 
-    const supabase =
-      createClient(
-        config.supabase_url,
-        config.supabase_anon_key,
-        {
-          auth: {
-            persistSession:
-              false,
-
-            autoRefreshToken:
-              false
-          }
+    const supabase = createClient(
+      config.supabase_url,
+      config.supabase_anon_key,
+      {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false
         }
-      );
+      }
+    );
 
-    /*
-     * Dateien bewusst nacheinander hochladen.
-     */
     for (
       let index = 0;
       index < files.length;
       index += 1
     ) {
-      const file =
-        files[index];
+      const file = files[index];
 
-      if (result) {
-        result.innerHTML = `
-          <div class="notice">
-            <strong>
-              Datei ${index + 1}
-              von ${files.length}
-            </strong>
-
-            <br>
-
-            ${escapeHtml(
-              file.name
-            )}
-            wird vorbereitet …
-          </div>
-        `;
-      }
+      showEditResult(
+        `Datei ${index + 1} von ${files.length}: ` +
+        `${file.name} wird vorbereitet …`,
+        false
+      );
 
       try {
-        /*
-         * 1. Signierte Upload-Daten von Netlify holen.
-         */
         const signed =
-          await api(
-            "file-upload-url",
-            {
-              method: "POST",
+          await api("file-upload-url", {
+            method: "POST",
 
-              body:
-                JSON.stringify({
-                  order_id:
-                    order.id,
-
-                  file_name:
-                    file.name,
-
-                  mime_type:
-                    file.type ||
-                    "application/octet-stream",
-
-                  size_bytes:
-                    file.size
-                })
-            }
-          );
+            body: JSON.stringify({
+              order_id: order.id,
+              file_name: file.name,
+              mime_type:
+                file.type ||
+                "application/octet-stream",
+              size_bytes: file.size
+            })
+          });
 
         if (
-          !signed
-            ?.storage_path ||
-          !signed
-            ?.token
+          !signed?.storage_path ||
+          !signed?.token
         ) {
           throw new Error(
-            "Die Upload-Function hat keine gültigen Upload-Daten zurückgegeben."
+            "Die Upload-Function lieferte keine gültigen Upload-Daten."
           );
         }
 
-        if (result) {
-          result.innerHTML = `
-            <div class="notice">
-              <strong>
-                Datei ${index + 1}
-                von ${files.length}
-              </strong>
-
-              <br>
-
-              ${escapeHtml(
-                file.name
-              )}
-              wird hochgeladen …
-            </div>
-          `;
-        }
-
-        /*
-         * 2. Datei direkt zu Supabase hochladen.
-         */
-        const {
-          error: uploadError
-        } =
-          await supabase
-            .storage
-            .from(
-              config.bucket
-            )
+        const { error: uploadError } =
+          await supabase.storage
+            .from(config.bucket)
             .uploadToSignedUrl(
               signed.storage_path,
               signed.token,
@@ -1239,221 +832,103 @@ async function uploadFiles(order) {
             );
 
         if (uploadError) {
-          throw new Error(
-            uploadError.message
-          );
+          throw new Error(uploadError.message);
         }
 
-        if (result) {
-          result.innerHTML = `
-            <div class="notice">
-              <strong>
-                Datei ${index + 1}
-                von ${files.length}
-              </strong>
+        await api("file-complete", {
+          method: "POST",
 
-              <br>
+          body: JSON.stringify({
+            order_id: order.id,
+            storage_path:
+              signed.storage_path,
+            original_name: file.name,
+            mime_type:
+              file.type ||
+              "application/octet-stream",
+            size_bytes: file.size
+          })
+        });
 
-              ${escapeHtml(
-                file.name
-              )}
-              wird dem Kundenkonto zugeordnet …
-            </div>
-          `;
-        }
-
-        /*
-         * 3. Datenbankeintrag erstellen.
-         */
-        await api(
-          "file-complete",
-          {
-            method: "POST",
-
-            body:
-              JSON.stringify({
-                order_id:
-                  order.id,
-
-                storage_path:
-                  signed.storage_path,
-
-                original_name:
-                  file.name,
-
-                mime_type:
-                  file.type ||
-                  "application/octet-stream",
-
-                size_bytes:
-                  file.size
-              })
-          }
-        );
-
-        successfulUploads += 1;
-      } catch (fileError) {
+        successful += 1;
+      } catch (error) {
         console.error(
           `Upload von ${file.name} fehlgeschlagen:`,
-          fileError
+          error
         );
 
-        failedUploads.push({
-          name:
-            file.name,
-
-          message:
-            fileError?.message ||
-            "Unbekannter Uploadfehler"
+        failed.push({
+          name: file.name,
+          message: error.message
         });
       }
     }
 
-    if (input) {
-      input.value = "";
+    input.value = "";
+
+    if (failed.length === 0) {
+      showEditResult(
+        `${successful} Datei(en) wurden erfolgreich hochgeladen.`,
+        false
+      );
+
+      return;
     }
 
-    if (
-      failedUploads.length === 0
-    ) {
-      if (result) {
-        result.innerHTML = `
-          <div class="notice notice-success">
-            ${successfulUploads}
-            ${
-              successfulUploads === 1
-                ? "Datei wurde"
-                : "Dateien wurden"
-            }
-            erfolgreich hochgeladen und
-            dem Kunden freigegeben.
-          </div>
-        `;
-      }
-    } else {
-      const failedList =
-        failedUploads
-          .map(
-            (item) => `
-              <li>
-                <strong>
-                  ${escapeHtml(
-                    item.name
-                  )}
-                </strong>
+    const failedText = failed
+      .map(
+        (item) =>
+          `${item.name}: ${item.message}`
+      )
+      .join(" | ");
 
-                <br>
-
-                ${escapeHtml(
-                  item.message
-                )}
-              </li>
-            `
-          )
-          .join("");
-
-      if (result) {
-        result.innerHTML = `
-          <div class="notice notice-error">
-            <p>
-              Erfolgreich:
-              ${successfulUploads}
-            </p>
-
-            <p>
-              Fehlgeschlagen:
-              ${failedUploads.length}
-            </p>
-
-            <ul>
-              ${failedList}
-            </ul>
-          </div>
-        `;
-      }
-    }
-  } catch (error) {
-    console.error(
-      "Upload konnte nicht gestartet werden:",
-      error
+    showEditResult(
+      `${successful} erfolgreich, ` +
+      `${failed.length} fehlgeschlagen. ` +
+      failedText,
+      true
     );
-
-    if (result) {
-      result.innerHTML = `
-        <div class="notice notice-error">
-          ${escapeHtml(
-            error?.message ||
-            "Der Upload konnte nicht gestartet werden."
-          )}
-        </div>
-      `;
-    }
+  } catch (error) {
+    showEditResult(
+      error.message ||
+        "Der Upload konnte nicht gestartet werden.",
+      true
+    );
   } finally {
-    if (uploadButton) {
-      uploadButton.disabled =
-        false;
-
-      uploadButton.textContent =
-        "Dateien hochladen";
-    }
+    button.disabled = false;
+    button.textContent = "Dateien hochladen";
   }
 }
 
 /* =========================================================
-   STATUSOPTIONEN
+   STATUS
 ========================================================= */
 
-function statusOptions(
-  selected
-) {
+function statusOptions(selected) {
   const statuses = {
-    received:
-      "Anfrage eingegangen",
-
-    planning:
-      "Termin wird geplant",
-
-    confirmed:
-      "Termin bestätigt",
-
-    recorded:
-      "Aufnahmen erstellt",
-
-    captured:
-      "Aufnahmen erstellt",
-
-    processing:
-      "In Bearbeitung",
-
-    editing:
-      "In Bearbeitung",
-
-    ready:
-      "Bereit zum Download",
-
-    completed:
-      "Abgeschlossen",
-
-    cancelled:
-      "Storniert"
+    received: "Anfrage eingegangen",
+    planning: "Termin wird geplant",
+    confirmed: "Termin bestätigt",
+    captured: "Aufnahmen erstellt",
+    recorded: "Aufnahmen erstellt",
+    processing: "In Bearbeitung",
+    editing: "In Bearbeitung",
+    ready: "Bereit zum Download",
+    completed: "Abgeschlossen",
+    cancelled: "Storniert"
   };
 
-  return Object
-    .entries(statuses)
-    .map(
-      ([value, label]) => `
+  return Object.entries(statuses)
+    .map(([value, label]) => {
+      return `
         <option
           value="${value}"
-          ${
-            value === selected
-              ? "selected"
-              : ""
-          }
+          ${value === selected ? "selected" : ""}
         >
           ${label}
         </option>
-      `
-    )
+      `;
+    })
     .join("");
 }
 
@@ -1463,25 +938,43 @@ function statusOptions(
 
 function showMessage(
   message,
-  error = false
+  isError = false
 ) {
   const element =
-    document.querySelector(
-      "#adminMessage"
-    );
+    document.querySelector("#adminMessage");
 
   if (!element) {
     return;
   }
 
   element.innerHTML = `
-    <div
-      class="notice ${
-        error
-          ? "notice-error"
-          : "notice-success"
-      }"
-    >
+    <div class="notice ${
+      isError
+        ? "notice-error"
+        : "notice-success"
+    }">
+      ${escapeHtml(message)}
+    </div>
+  `;
+}
+
+function showEditResult(
+  message,
+  isError = false
+) {
+  const element =
+    document.querySelector("#editResult");
+
+  if (!element) {
+    return;
+  }
+
+  element.innerHTML = `
+    <div class="notice ${
+      isError
+        ? "notice-error"
+        : "notice-success"
+    }">
       ${escapeHtml(message)}
     </div>
   `;

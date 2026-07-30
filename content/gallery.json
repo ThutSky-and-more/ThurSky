@@ -6,11 +6,6 @@
       "alt": "Kirche Alterswilen"
     },
     {
-      "image": "/assets/images/uploads/feld.jpeg",
-      "title": "Feld",
-      "alt": "Feld Lengwil ThurSKy"
-    },
-    {
       "image": "/assets/images/uploads/dji_0458.jpg",
       "title": "Bild Kirche",
       "alt": "ThurSky Kirche Alterswilen"
@@ -24,6 +19,11 @@
       "image": "/assets/images/uploads/feld.jpeg",
       "title": "Feld",
       "alt": "Feld ThurSky"
+    },
+    {
+      "image": "/assets/images/uploads/dji_0136.jpg",
+      "title": "Strand",
+      "alt": "ThurSky Strand"
     }
   ]
 }

@@ -2,7 +2,7 @@
 title: Galerie update
 date: 2026-08-15T16:54:00+02:00
 description: Videos aus der Luft.
-image: https://dronenshots-kemmental.ch/galerie/
+image: /assets/images/news/dji_0557.jpg
 published: true
 ---
 Ab sofort gibt es in unserer Galerie nicht nur Bilder, sondern auch **Videos aus der Luft**.

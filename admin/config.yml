@@ -4,43 +4,212 @@ backend:
 
 locale: de
 publish_mode: simple
-media_folder: "assets/images/uploads"
-public_folder: "/assets/images/uploads"
+
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
 
 collections:
-  - name: "gallery"
-    label: "Galerie"
-    files:
-      - name: "gallery"
-        label: "Galerie-Bilder"
-        file: "content/gallery.json"
-        format: "json"
-        fields:
-          - label: "Bilder"
-            name: "images"
-            widget: "list"
-            summary: "{{fields.title}}"
-            fields:
-              - { label: "Bild", name: "image", widget: "image" }
-              - { label: "Titel", name: "title", widget: "string" }
-              - { label: "Alternativtext", name: "alt", widget: "string", hint: "Beschreibt das Bild für Suchmaschinen und Bildschirmleser." }
-              - { label: "Bildunterschrift", name: "caption", widget: "text", required: false }
+
+  # =========================================================
+  # NEWS
+  # =========================================================
+
   - name: "news"
     label: "News"
+    label_singular: "News-Beitrag"
+    folder: "content/news"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+
+    summary: "{{title}} – {{date}}"
+
+    sortable_fields:
+      - "date"
+      - "title"
+
+    fields:
+
+      - label: "Titel"
+        name: "title"
+        widget: "string"
+
+      - label: "Veröffentlichungsdatum"
+        name: "date"
+        widget: "datetime"
+        format: "YYYY-MM-DDTHH:mm:ssZ"
+
+      - label: "Kurzbeschreibung"
+        name: "description"
+        widget: "text"
+
+      - label: "Titelbild"
+        name: "image"
+        widget: "image"
+        required: false
+        media_folder: "/assets/images/news"
+        public_folder: "/assets/images/news"
+
+      - label: "Veröffentlicht"
+        name: "published"
+        widget: "boolean"
+        default: true
+
+      - label: "Inhalt"
+        name: "body"
+        widget: "markdown"
+
+
+  # =========================================================
+  # GALERIE
+  # =========================================================
+
+  - name: "gallery"
+    label: "Galerie"
+
     files:
-      - name: "news"
-        label: "News-Beiträge"
-        file: "content/news.json"
+
+      - label: "Galerie verwalten"
+        name: "gallery"
+        file: "content/gallery.json"
         format: "json"
+
         fields:
-          - label: "Beiträge"
-            name: "posts"
+
+          - label: "Galerie"
+            name: "items"
             widget: "list"
-            summary: "{{fields.title}} – {{fields.date}}"
+
+            label_singular: "Galerie-Eintrag"
+
+            summary: "{{fields.title}} – {{fields.type}}"
+
+            collapsed: true
+
+            add_to_top: true
+
             fields:
-              - { label: "Titel", name: "title", widget: "string" }
-              - { label: "Datum", name: "date", widget: "datetime", format: "YYYY-MM-DDTHH:mm:ssZ" }
-              - { label: "Kurzbeschreibung", name: "description", widget: "text" }
-              - { label: "Titelbild", name: "image", widget: "image", required: false }
-              - { label: "Inhalt", name: "body", widget: "text" }
-              - { label: "Veröffentlicht", name: "published", widget: "boolean", default: true }
+
+              # ---------------------------------------------
+              # TITEL
+              # ---------------------------------------------
+
+              - label: "Titel"
+                name: "title"
+                widget: "string"
+
+                hint: >
+                  Zum Beispiel:
+                  Sonnenuntergang über Kemmental
+
+
+              # ---------------------------------------------
+              # TYP
+              # ---------------------------------------------
+
+              - label: "Typ"
+                name: "type"
+                widget: "select"
+                default: "image"
+
+                options:
+
+                  - label: "Bild"
+                    value: "image"
+
+                  - label: "Video"
+                    value: "video"
+
+
+              # ---------------------------------------------
+              # BILD
+              # ---------------------------------------------
+
+              - label: "Bild"
+                name: "image"
+                widget: "image"
+                required: false
+
+                media_folder: "/assets/media/gallery"
+                public_folder: "/assets/media/gallery"
+
+                hint: >
+                  Nur verwenden, wenn beim Typ
+                  „Bild“ ausgewählt wurde.
+
+
+              # ---------------------------------------------
+              # VIDEO
+              # ---------------------------------------------
+
+              - label: "Video"
+                name: "video"
+                widget: "file"
+                required: false
+
+                media_folder: "/assets/media/gallery"
+
+                choose_url: false
+
+                media_library:
+                  config:
+
+                    # 100 MB
+                    max_file_size: 104857600
+
+                hint: >
+                  MP4 empfohlen.
+                  Bitte nur komprimierte Web-Videos hochladen.
+
+
+              # ---------------------------------------------
+              # VIDEO-VORSCHAUBILD
+              # ---------------------------------------------
+
+              - label: "Video-Vorschaubild"
+                name: "poster"
+                widget: "image"
+                required: false
+
+                media_folder: "/assets/media/gallery"
+                public_folder: "/assets/media/gallery"
+
+                hint: >
+                  Optionales Bild, das angezeigt wird,
+                  bevor das Video gestartet wird.
+
+
+              # ---------------------------------------------
+              # BESCHREIBUNG
+              # ---------------------------------------------
+
+              - label: "Beschreibung"
+                name: "description"
+                widget: "text"
+                required: false
+
+                hint: >
+                  Kurze Beschreibung der Aufnahme.
+
+
+              # ---------------------------------------------
+              # ALT-TEXT
+              # ---------------------------------------------
+
+              - label: "Alternativtext"
+                name: "alt"
+                widget: "string"
+                required: false
+
+                hint: >
+                  Kurze Beschreibung für Suchmaschinen
+                  und Barrierefreiheit.
+
+
+              # ---------------------------------------------
+              # SICHTBAR
+              # ---------------------------------------------
+
+              - label: "Anzeigen"
+                name: "published"
+                widget: "boolean"
+                default: true

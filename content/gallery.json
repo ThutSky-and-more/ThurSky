@@ -1,64 +1,130 @@
 {
   "items": [
     {
+      "type": "image",
+      "published": true,
+      "image": "/assets/media/gallery/dji_0295.jpg",
+      "title": "Feld",
+      "alt": "ThurSky Feld"
+    },
+    {
+      "type": "image",
+      "published": true,
+      "image": "/assets/media/gallery/dji_0309_1.jpg",
+      "title": "Sonnenuntergang",
+      "alt": "ThurSky Sonnenuntergang"
+    },
+    {
+      "type": "image",
+      "published": true,
+      "image": "/assets/media/gallery/dji_0403.jpg",
+      "title": "Feld",
+      "alt": "ThurSky Feld"
+    },
+    {
+      "type": "image",
+      "published": true,
+      "title": "Brücke",
+      "image": "/assets/media/gallery/dji_0583.jpg",
+      "alt": "ThurSky Brücke"
+    },
+    {
+      "type": "image",
+      "published": true,
+      "title": "Waldweg",
+      "image": "/assets/media/gallery/dji_0579.jpg",
+      "alt": "ThurSky Waldweg"
+    },
+    {
+      "type": "image",
+      "published": true,
+      "title": "Französische Stadt",
+      "image": "/assets/media/gallery/dji_0599.jpg",
+      "alt": "ThurSky Französische Stadt"
+    },
+    {
       "image": "/assets/images/uploads/dji_0454.jpg",
       "title": "Bild Kirche",
-      "alt": "Kirche Alterswilen"
+      "alt": "Kirche Alterswilen",
+      "type": "image",
+      "published": true
     },
     {
       "image": "/assets/images/uploads/dji_0458.jpg",
       "title": "Bild Kirche",
-      "alt": "ThurSky Kirche Alterswilen"
+      "alt": "ThurSky Kirche Alterswilen",
+      "type": "image",
+      "published": true
     },
     {
       "image": "/assets/images/uploads/dji_0457.jpg",
       "title": "Kirche",
-      "alt": "Kirche alterswilen ThurSky"
+      "alt": "Kirche alterswilen ThurSky",
+      "type": "image",
+      "published": true
     },
     {
       "image": "/assets/images/uploads/feld.jpeg",
       "title": "Feld",
-      "alt": "Feld ThurSky"
+      "alt": "Feld ThurSky",
+      "type": "image",
+      "published": true
     },
     {
       "image": "/assets/images/uploads/dji_0136.jpg",
       "title": "Strand",
-      "alt": "ThurSky Strand"
+      "alt": "ThurSky Strand",
+      "type": "image",
+      "published": true
     },
     {
       "image": "/assets/images/uploads/dji_0439.jpg",
       "title": "Rapsfeld",
-      "alt": "ThurSky Rapsfeld"
+      "alt": "ThurSky Rapsfeld",
+      "type": "image",
+      "published": true
     },
     {
       "image": "/assets/images/uploads/dji_0378.jpg",
       "title": "Feld",
-      "alt": "ThurSky Feld"
+      "alt": "ThurSky Feld",
+      "type": "image",
+      "published": true
     },
     {
       "image": "/assets/images/uploads/dji_0278.jpg",
       "title": "Dach",
-      "alt": "ThurSky Dach"
+      "alt": "ThurSky Dach",
+      "type": "image",
+      "published": true
     },
     {
       "image": "/assets/images/uploads/dji_0275.jpg",
       "title": "Dach",
-      "alt": "ThurSky Dach"
+      "alt": "ThurSky Dach",
+      "type": "image",
+      "published": true
     },
     {
       "title": "Gartenhaus",
       "alt": "ThurSky Gartenhaus",
-      "image": "/assets/images/uploads/dji_0281.jpg"
+      "image": "/assets/images/uploads/dji_0281.jpg",
+      "type": "image",
+      "published": true
     },
     {
       "image": "/assets/images/uploads/dji_0274.jpg",
       "title": "Dach",
-      "alt": "ThurSky Dach"
+      "alt": "ThurSky Dach",
+      "type": "image",
+      "published": true
     },
     {
       "image": "/assets/images/uploads/dji_0298.jpg",
       "title": "Feld",
-      "alt": "ThurSky Feld"
+      "alt": "ThurSky Feld",
+      "type": "image",
+      "published": true
     }
   ]
 }

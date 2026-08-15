@@ -44,6 +44,16 @@
       "image": "/assets/images/uploads/dji_0275.jpg",
       "title": "Dach",
       "alt": "ThurSky Dach"
+    },
+    {
+      "title": "Gartenhaus",
+      "alt": "ThurSky Gartenhaus",
+      "image": "/assets/images/uploads/dji_0281.jpg"
+    },
+    {
+      "image": "/assets/images/uploads/dji_0274.jpg",
+      "title": "Dach",
+      "alt": "ThurSky Dach"
     }
   ]
 }

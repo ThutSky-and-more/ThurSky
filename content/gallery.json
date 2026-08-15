@@ -125,6 +125,14 @@
       "alt": "ThurSky Feld",
       "type": "image",
       "published": true
+    },
+    {
+      "type": "video",
+      "published": true,
+      "title": "Drohnenflug",
+      "video": "/assets/images/DJI_0559-cut.mp4",
+      "poster": "",
+      "description": "Drohnenvideo von ThurSky"
     }
   ]
 }

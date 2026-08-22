@@ -3,6 +3,29 @@
     {
       "type": "image",
       "published": true,
+      "title": "Bergrennen Steckborn",
+      "image": "/assets/media/gallery/screenshot-2026-08-22-210417.png",
+      "alt": "Bergrennen Steckborn"
+    },
+    {
+      "type": "image",
+      "published": true,
+      "image": "/assets/media/gallery/dji_0628.jpg",
+      "title": "Bergrennen steckborn",
+      "description": "",
+      "alt": "Bergrennen Steckborn"
+    },
+    {
+      "type": "image",
+      "published": true,
+      "image": "/assets/media/gallery/dji_0647.jpg",
+      "title": "Bergrennen steckborn",
+      "description": "",
+      "alt": "Bergrennen Steckborn"
+    },
+    {
+      "type": "image",
+      "published": true,
       "image": "/assets/media/gallery/dji_0295.jpg",
       "title": "Feld",
       "alt": "ThurSky Feld"
